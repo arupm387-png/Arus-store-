@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Arus Admin Master</title>
+  
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+  <style>
+    /* ========================================================= */
+    /* 🎨 ১. অ্যাডমিন প্যানেলের মেইন থিম এবং কালার */
+    /* ========================================================= */
+    :root { 
+        --dark: #1e293b;   
+        --blue: #2563eb;   
+        --l-bg: #f8fafc;   
+        --white: #ffffff;  
+        --green: #16a34a;  
+        --red: #dc2626;    
+        --pink: #ec4899;   
+        --gold: #f59e0b;   
+        --wa-teal: #075e54;
+    }
+
+    body { 
+        margin: 0; 
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+        background: var(--l-bg); 
+        color: #333; 
+        display: flex; 
+        height: 100vh; 
+        overflow: hidden; 
+    }
+    
+    /* ========================================================= */
+    /* 🔐 ২. লগইন স্ক্রিন ডিজাইন */
+    /* ========================================================= */
+    #loginScreen { 
+        position: fixed; 
+        inset: 0; 
+        background: var(--dark); 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        z-index: 9999; 
+    }
+
+    .login-box { 
+        background: var(--white); 
+        padding: 40px; 
+        border-radius: 12px; 
+        width: 90%; 
+        max-width: 340px; 
+        text-align: center; 
+        box-shadow: 0 15px 30px rgba(0,0,0,0.5); 
+    }
+
+    .login-logo { 
+        max-width: 200px; 
+        max-height: 80px; 
+        margin-bottom: 15px; 
+        object-fit: contain; 
+    }
+
+    .login-box input[type="text"],
+    .login-box input[type="password"] { 
+        width: 100%; 
+        margin-top: 15px; 
+        padding: 14px; 
+        border-radius: 8px; 
+        border: 1px solid #cbd5e1; 
+        box-sizing: border-box; 
+        font-size: 15px; 
+        outline: none; 
+        transition: border-color 0.3s; 
+    }
+
+    .login-box input:focus { 
+        border-color: var(--blue); 
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.1); 
+    }
+
+    .pass-box { 
+        position: relative; 
+        width: 100%; 
+    }
+
+    .eye-icon { 
+        position: absolute; 
+        right: 15px; 
+        top: 28px; 
+        cursor: pointer; 
+        font-size: 18px; 
+        user-select: none; 
+        z-index: 10; 
+        color: #64748b; 
+    }
+    
+    .remember-box {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-top: 15px;
+        gap: 8px;
+        font-size: 13px;
+        color: #475569;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    
+    .remember-box input[type="checkbox"] {
+        margin: 0;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .login-box button { 
+        width: 100%; 
+        margin-top: 25px; 
+        padding: 14px; 
+        background: var(--blue); 
+        color: white; 
+        border: none; 
+        font-weight: bold; 
+        border-radius: 8px; 
+        cursor: pointer; 
+        font-size: 16px; 
+        transition: all 0.3s ease; 
+        box-shadow: 0 4px 6px rgba(37,99,235,0.2); 
+    }
+
+    .login-box button:hover { 
+        background: #1d4ed8; 
+        transform: translateY(-1px); 
+    }
+
+    .login-box button:disabled { 
+        background: #94a3b8; 
+        cursor: not-allowed; 
+    }
+
+    #loginMsg { 
+        color: var(--red); 
+        margin-top: 15px; 
+        font-size: 14px; 
+        font-weight: bold; 
+        min-height: 20px; 
+    }
+    
+    /* ========================================================= */
+    /* 📱 ৩. সাইডবার ডিজাইন */
+    /* ========================================================= */
+    .sidebar { 
+        width: 260px; 
+        background: var(--dark); 
+        color: white; 
+        display: flex; 
+        flex-direction: column; 
+        position: fixed; 
+        height: 100vh; 
+        z-index: 1000; 
+        left: 0; 
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+    }
+
+    .sidebar h2 { 
+        text-align: center; 
+        padding: 25px 0; 
+        margin: 0; 
+        border-bottom: 1px solid #334155; 
+        color: #60a5fa; 
+        font-size: 24px; 
+        letter-spacing: 1px;
+    }
+
+    .menu-btn { 
+        padding: 16px 20px; 
+        background: none; 
+        border: none; 
+        color: #cbd5e1; 
+        text-align: left; 
+        font-size: 15px; 
+        cursor: pointer; 
+        border-left: 4px solid transparent; 
+        font-weight: 600; 
+        transition: 0.2s; 
+    }
+
+    .menu-btn:hover { 
+        background: #334155; 
+        color: white; 
+    }
+
+    .menu-btn.active { 
+        background: #334155; 
+        color: white; 
+        border-left-color: var(--blue); 
+    }
+    
+    /* ========================================================= */
+    /* 🖥️ ৪. মেইন কন্টেন্ট এরিয়া এবং হেডার */
+    /* ========================================================= */
+    .main-content { 
+        flex: 1; 
+        margin-left: 260px; 
+        display: flex; 
+        flex-direction: column; 
+        overflow: hidden; 
+        width: calc(100% - 260px); 
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    }
+    
+    .header { 
+        background: white; 
+        padding: 10px 15px; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        border-bottom: 1px solid #e2e8f0; 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+        height: 60px; 
+        flex-shrink: 0; 
+        position: relative;
+    }
+
+    .header-left { 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        overflow: hidden; 
+        z-index: 2;
+    }
+
+    .header-right { 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        z-index: 2;
+    }
+    
+    .header-center { 
+        position: absolute; 
+        left: 50%; 
+        top: 50%; 
+        transform: translate(-50%, -50%); 
+        z-index: 1; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+    }
+
+    #topCenterLogo { 
+        max-height: 38px; 
+        object-fit: contain; 
+    }
+
+    #welcomeHeaderMsg { 
+        font-weight: 800; 
+        color: var(--blue); 
+        font-size: 15px; 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+        max-width: 220px; 
+    }
+
+    #liveClock { 
+        font-size: 11px; 
+        font-weight: bold; 
+        background: #f1f5f9; 
+        padding: 6px 12px; 
+        border-radius: 15px; 
+        color: #475569; 
+        border: 1px solid #e2e8f0; 
+        white-space: nowrap; 
+    }
+
+    /* ========================================================= */
+    /* 🔍 ৫. ফিল্টার এবং সাব-ট্যাব এরিয়া */
+    /* ========================================================= */
+    .top-controls { 
+        flex-shrink: 0; 
+        background: white; 
+        border-bottom: 1px solid #e2e8f0; 
+    }
+    
+    .status-tabs { 
+        display: flex; 
+        gap: 12px; 
+        overflow-x: auto; 
+        padding: 10px 15px; 
+        white-space: nowrap; 
+        scrollbar-width: none; 
+    }
+
+    .status-tabs::-webkit-scrollbar { 
+        display: none; 
+    }
+
+    .status-pill { 
+        padding: 8px 18px; 
+        background: #f1f5f9; 
+        border: 1px solid #cbd5e1; 
+        border-radius: 20px; 
+        font-size: 13px; 
+        font-weight: bold; 
+        color: #475569; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .status-pill:hover { 
+        background: #e2e8f0; 
+    }
+
+    .status-pill.active { 
+        background: var(--dark); 
+        color: white; 
+        border-color: var(--dark); 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+    }
+    
+    .filter-bar { 
+        padding: 10px 15px; 
+        display: flex; 
+        gap: 8px; 
+        align-items: center; 
+        flex-wrap: nowrap; 
+        overflow-x: auto; 
+        white-space: nowrap; 
+        background: #f8fafc; 
+    }
+
+    .filter-bar::-webkit-scrollbar { 
+        height: 4px; 
+    }
+
+    .filter-bar::-webkit-scrollbar-thumb { 
+        background: #cbd5e1; 
+        border-radius: 4px; 
+    }
+
+    .filter-bar input, 
+    .filter-bar select { 
+        padding: 8px 12px; 
+        border: 1px solid #cbd5e1; 
+        border-radius: 6px; 
+        font-size: 13px; 
+        outline: none; 
+        flex: 1; 
+        min-width: 100px; 
+        transition: 0.2s; 
+        background: white;
+    }
+
+    .filter-bar input:focus, 
+    .filter-bar select:focus { 
+        border-color: var(--blue); 
+    }
+    
+    .order-filter-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    .order-filter-row {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+        align-items: center;
+    }
+
+    .btn-clear { 
+        background: #e2e8f0; 
+        color: #475569; 
+        border: none; 
+        padding: 8px 15px; 
+        border-radius: 6px; 
+        font-weight: bold; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        font-size: 12px; 
+        white-space: nowrap; 
+        flex-shrink: 0;
+    }
+
+    .btn-clear:hover { 
+        background: #cbd5e1; 
+    }
+
+    .btn-action { 
+        background: var(--blue); 
+        color: white; 
+        padding: 8px 15px; 
+        border: none; 
+        border-radius: 6px; 
+        cursor: pointer; 
+        font-weight: bold; 
+        box-shadow: 0 2px 4px rgba(37,99,235,0.2); 
+        transition: 0.2s; 
+        font-size: 12px; 
+        white-space: nowrap; 
+        flex-shrink: 0;
+    }
+
+    .btn-action:hover { 
+        background: #1d4ed8; 
+    }
+    
+    /* ========================================================= */
+    /* 📦 ৬. কার্ড ও ডেটা টেবিল এরিয়া */
+    /* ========================================================= */
+    .content-area { 
+        padding: 15px; 
+        overflow-y: auto; 
+        flex: 1; 
+        background: var(--l-bg); 
+    }
+
+    .cards-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+        gap: 15px; 
+        padding-bottom: 80px; 
+    }
+    
+    .order-card { 
+        background: white; 
+        border-radius: 10px; 
+        padding: 15px; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+        border-top: 4px solid var(--blue); 
+        position: relative; 
+        transition: transform 0.2s; 
+    }
+
+    .order-card:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1); 
+    }
+
+    .order-card.selected { 
+        border: 2px solid var(--blue); 
+        background: #f0f9ff; 
+    } 
+    
+    .badge { 
+        padding: 4px 10px; 
+        border-radius: 12px; 
+        font-size: 10px; 
+        color: white; 
+        font-weight: bold; 
+        text-transform: uppercase; 
+        letter-spacing: 0.5px; 
+    }
+
+    .p-row { 
+        font-size: 13px; 
+        margin: 6px 0; 
+        color: #334155; 
+        line-height: 1.4; 
+    }
+
+    .p-row b { 
+        color: #0f172a; 
+    }
+    
+    .update-box { 
+        margin-top: 12px; 
+        background: #f8fafc; 
+        padding: 10px; 
+        border-radius: 6px; 
+        border: 1px solid #e2e8f0; 
+    }
+
+    .update-box select, 
+    .update-box input { 
+        width: 100%; 
+        padding: 8px; 
+        margin-bottom: 8px; 
+        border: 1px solid #cbd5e1; 
+        border-radius: 4px; 
+        font-size: 12px; 
+        box-sizing: border-box; 
+        outline: none; 
+    }
+
+    .btn-update { 
+        width: 100%; 
+        background: var(--blue); 
+        color: white; 
+        border: none; 
+        padding: 8px; 
+        border-radius: 4px; 
+        cursor: pointer; 
+        font-weight: bold; 
+        font-size: 12px; 
+        transition: 0.2s; 
+        text-transform: uppercase; 
+    }
+    
+    /* 🔥 Bulk Action Bar */
+    #bulkActionBar { 
+        display: none; 
+        position: fixed; 
+        bottom: 15px; 
+        left: 50%; 
+        transform: translateX(calc(-50% + 130px)); 
+        background: var(--dark); 
+        padding: 10px 20px; 
+        border-radius: 10px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4); 
+        z-index: 10000; 
+        align-items: center; 
+        gap: 10px; 
+        flex-wrap: wrap; 
+        width: 90%; 
+        max-width: 850px; 
+        justify-content: center; 
+        border: 2px solid #334155;
+    }
+
+    #bulkActionBar select, 
+    #bulkActionBar input { 
+        padding: 8px; 
+        border-radius: 4px; 
+        border: none; 
+        font-size: 12px; 
+        outline: none; 
+        min-width: 120px; 
+    }
+
+    #bulkActionBar button { 
+        background: var(--blue); 
+        color: white; 
+        border: none; 
+        padding: 8px 15px; 
+        border-radius: 4px; 
+        font-weight: bold; 
+        cursor: pointer; 
+        font-size: 12px;
+    }
+
+    /* ডেটা টেবিল */
+    .data-table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        background: white; 
+        font-size: 13px; 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+        border-radius: 8px; 
+        overflow: hidden;
+    }
+
+    .data-table th, 
+    .data-table td { 
+        padding: 10px; 
+        text-align: left; 
+        border-bottom: 1px solid #f1f5f9; 
+        vertical-align: middle; 
+    }
+
+    .data-table th { 
+        background: var(--dark); 
+        color: white; 
+        position: sticky; 
+        top: 0; 
+        z-index: 10; 
+        font-weight: 600; 
+        font-size: 12px;
+    }
+
+    .data-table tr:hover { 
+        background-color: #f8fafc; 
+    }
+
+    .table-responsive { 
+        overflow-x: auto; 
+        border-radius: 8px; 
+        max-height: 65vh; 
+        background: white; 
+        padding: 1px;
+    }
+    
+    .action-btn-sm { 
+        padding: 4px 8px; 
+        border: none; 
+        border-radius: 4px; 
+        font-size: 11px; 
+        font-weight: bold; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        color: white; 
+        margin-right:4px;
+    }
+
+    .btn-edit { background: var(--blue); } 
+    .btn-del { background: var(--red); }
+
+    /* ========================================================= */
+    /* 📊 ৭. ফাইন্যান্স ও স্টক ড্যাশবোর্ড */
+    /* ========================================================= */
+    .summary-box { 
+        background: white; 
+        border-radius: 8px; 
+        padding: 15px; 
+        display: flex; 
+        gap: 15px; 
+        margin-bottom: 15px; 
+        border-left: 4px solid var(--blue); 
+        flex-wrap: wrap;
+    }
+
+    .sum-item { 
+        flex: 1; 
+        text-align: center; 
+        border-right: 1px solid #e2e8f0; 
+        min-width: 100px; 
+        padding: 5px;
+    }
+
+    .sum-item:last-child { 
+        border-right: none; 
+    }
+
+    .sum-label { 
+        font-size: 11px; 
+        color: #64748b; 
+        font-weight: bold; 
+        text-transform: uppercase; 
+    }
+
+    .sum-val { 
+        font-size: 20px; 
+        color: var(--dark); 
+        font-weight: 900; 
+        margin-top: 5px; 
+    }
+
+    /* ========================================================= */
+    /* 🪟 ৮. পপআপ মোডাল */
+    /* ========================================================= */
+    .glass-modal { 
+        display: none; 
+        position: fixed; 
+        inset: 0; 
+        background: rgba(15, 23, 42, 0.75); 
+        z-index: 10000; 
+        justify-content: center; 
+        align-items: center; 
+        padding: 15px; 
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-content { 
+        background: white; 
+        padding: 20px; 
+        border-radius: 10px; 
+        width: 100%; 
+        max-width: 600px; 
+        max-height: 85vh; 
+        overflow-y: auto; 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+    }
+
+    .modal-content h3 { 
+        margin-top: 0; 
+        font-size: 18px; 
+        margin-bottom: 15px; 
+        border-bottom: 1px solid #eee; 
+        padding-bottom: 10px;
+    }
+    
+    .form-group { 
+        margin-bottom: 12px; 
+    }
+
+    .form-group label { 
+        display: block; 
+        font-size: 12px; 
+        font-weight: bold; 
+        margin-bottom: 5px; 
+        color: #475569; 
+    }
+    
+    .form-group input, 
+    .form-group textarea, 
+    .form-group select { 
+        width: 100%; 
+        padding: 10px; 
+        border: 1px solid #cbd5e1; 
+        border-radius: 6px; 
+        font-size: 13px; 
+        font-family: inherit;
+        box-sizing: border-box;
+    }
+
+    .form-group input[type="file"] { 
+        border: 1px dashed var(--blue); 
+        background: #eff6ff; 
+        padding: 10px; 
+        cursor: pointer; 
+    }
+
+    .form-group input:focus, 
+    .form-group textarea:focus, 
+    .form-group select:focus { 
+        border-color: var(--blue); 
+        outline: none;
+    }
+
+    /* Variant Builder */
+    .variant-row { 
+        display: flex; 
+        gap: 6px; 
+        margin-bottom: 6px; 
+        align-items: center; 
+        background: #f8fafc; 
+        padding: 8px; 
+        border-radius: 6px; 
+        border: 1px solid #cbd5e1; 
+        flex-wrap: wrap;
+    }
+
+    .variant-row input { 
+        margin-bottom: 0 !important; 
+        padding: 6px !important; 
+        flex: 1; 
+        min-width: 70px; 
+        font-size: 11px;
+    }
+
+    .v-remove-btn { 
+        background: var(--red); 
+        color: white; 
+        border: none; 
+        width: 24px; 
+        height: 24px; 
+        border-radius: 50%; 
+        font-weight: bold; 
+        flex-shrink: 0; 
+        font-size: 10px; 
+        cursor: pointer;
+    }
+
+    .add-v-btn { 
+        background: #eff6ff; 
+        color: var(--blue); 
+        border: 1px dashed var(--blue); 
+        padding: 8px; 
+        border-radius: 6px; 
+        font-weight: bold; 
+        width: 100%; 
+        margin-top: 5px; 
+        font-size: 12px; 
+        cursor: pointer;
+    }
+    
+    /* 🍞 টোস্ট মেসেজ */
+    #adminToast { 
+        visibility: hidden; 
+        min-width: 250px; 
+        text-align: center; 
+        border-radius: 6px; 
+        padding: 12px 15px; 
+        position: fixed; 
+        z-index: 25000; 
+        left: 50%; 
+        bottom: 20px; 
+        transform: translateX(-50%); 
+        font-size: 13px; 
+        font-weight: bold; 
+        color: #fff; 
+        opacity: 0; 
+        transition: 0.3s; 
+    }
+
+    #adminToast.show { 
+        visibility: visible; 
+        opacity: 1; 
+        bottom: 30px; 
+    }
+
+    #adminToast.success { background-color: var(--green); } 
+    #adminToast.error { background-color: var(--red); }
+
+    /* ⚠️ ডিলিট কনফার্মেশন */
+    #customConfirm { 
+        display: none; 
+        position: fixed; 
+        inset: 0; 
+        background: rgba(15, 23, 42, 0.8); 
+        z-index: 25000; 
+        justify-content: center; 
+        align-items: center; 
+        padding: 20px; 
+    }
+
+    .confirm-box { 
+        background: white; 
+        padding: 20px; 
+        border-radius: 10px; 
+        text-align: center; 
+        max-width: 300px; 
+    }
+
+    .confirm-box h3 { 
+        margin-top: 0; 
+        font-size: 15px; 
+        margin-bottom: 20px; 
+        color: var(--dark);
+    }
+
+    .confirm-btns { 
+        display: flex; 
+        gap: 10px; 
+    }
+    
+    /* 📱 ৯. মোবাইল রেসপনসিভ */
+    @media (max-width: 768px) { 
+        .sidebar { left: -260px; } 
+        .sidebar.open { left: 0; } 
+        .main-content { margin-left: 0; width: 100%; height: 100vh; display: flex; flex-direction: column; } 
+        .top-controls { flex: none; height: auto; max-height: none; overflow: visible; }
+        .content-area { flex: 1; max-height: none; overflow-y: auto; padding-bottom: 90px; padding-top: 10px; }
+        .header { height: 55px; padding: 5px 10px; }
+        #welcomeHeaderMsg { display: none !important; } 
+        #topCenterLogo { max-height: 28px; }
+        #liveClock { padding: 4px 6px; font-size: 10px; }
+        .filter-bar { padding: 8px 10px; gap: 6px; flex-wrap: wrap; }
+        .order-filter-container { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        .order-filter-row { display: flex; gap: 8px; width: 100%; align-items: center; }
+        .order-filter-row input, .order-filter-row select { flex: 1; }
+        .cards-grid { grid-template-columns: 1fr; gap: 12px; padding-bottom: 90px; }
+        .summary-box { flex-direction: row; gap: 8px; flex-wrap: wrap; }
+        .sum-item { border-right: 1px solid #e2e8f0; min-width: 45%; padding-bottom: 5px; margin-bottom: 5px; }
+        #bulkActionBar { transform: translateX(-50%); width: 95%; padding: 8px; bottom: 10px; gap: 6px; }
+        #bulkActionBar select, #bulkActionBar input { min-width: 48%; padding: 6px; font-size: 11px; }
+        #bulkActionBar button { padding: 6px 10px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loginScreen">
+    <div class="login-box">
+      <img src="https://placehold.co/300x100/e2e8f0/1e293b?text=Loading..." id="loginLogoObj" class="login-logo" alt="Store Logo">
+      <h2 style="color:var(--dark); margin-top:5px; font-size:20px;">Admin Login</h2>
+      <input type="text" id="lUserId" placeholder="👤 User ID" onkeydown="handleLoginKey(event)">
+      <div class="pass-box">
+        <input type="password" id="lPass" placeholder="🔒 Password" onkeydown="handleLoginKey(event)">
+        <span class="eye-icon" id="eyeIcon" onclick="togglePass()">👁️</span>
+      </div>
+      <label class="remember-box">
+          <input type="checkbox" id="rememberMeCb"> Save User ID
+      </label>
+      <button onclick="doLogin()" id="loginBtn">LOGIN SECURELY</button>
+      <div id="loginMsg"></div>
+    </div>
+  </div>
+
+  <div class="sidebar" id="sidebar">
+    <h2 id="sidebarTitle">Arus Store</h2>
+    <button class="menu-btn active" onclick="switchTab('Orders', this)" id="tabOrders">📦 Orders</button>
+    <button class="menu-btn" onclick="switchTab('Products', this)" id="tabProd">🛍️ Products</button>
+    <button class="menu-btn" onclick="switchTab('Vendors', this)" id="tabVendors">🏪 Vendors</button>
+    <button class="menu-btn" onclick="switchTab('Accounts', this)" id="tabEarnings" style="display:none;">💰 My Earnings</button>
+
+    <button class="menu-btn" onclick="openCombinedTab('FinanceExp', this)" id="tabFinExp">📊 Finance & Ledger</button>
+    <button class="menu-btn" onclick="openCombinedTab('PromoTools', this)" id="tabPromo">🎟️ Promo & Tools</button>
+    <button class="menu-btn" onclick="openCombinedTab('UserRev', this)" id="tabUserRev">👥 Users</button>
+    
+    <div style="margin-top:auto; padding:20px; text-align:center; border-top: 1px solid #334155; background: rgba(0,0,0,0.1);">
+        <b id="uNameDispSide" style="color:#60a5fa; font-size: 14px;">User</b><br>
+        <button onclick="logoutAdmin()" style="margin-top:15px; padding:10px; background:var(--red); border:none; color:white; border-radius:6px; width:100%; cursor:pointer; font-weight:bold; font-size: 12px;">🚪 LOGOUT</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <div class="header-left">
+          <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="font-size:22px; background:none; border:none; cursor:pointer; color: var(--dark); padding: 0;">☰</button>
+          <div id="welcomeHeaderMsg" style="display:none;"></div>
+      </div>
+      <div class="header-center">
+          <img id="topCenterLogo" src="" alt="Logo" onerror="this.src='https://placehold.co/150x40/ffffff/1e293b?text=Arus+Store'">
+      </div>
+      <div class="header-right">
+          <div id="liveClock">Loading Time...</div>
+          <button onclick="switchTab(currentTab, document.querySelector('.menu-btn.active'))" style="background:#e2e8f0; color:#475569; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:14px; font-weight:bold; transition: 0.2s;" title="Refresh Data">🔄</button>
+      </div>
+    </div>
+    
+    <div class="top-controls" id="topControlsArea">
+        <div class="status-tabs" id="statusTabs" style="display:none;"></div>
+        <div class="status-tabs" id="subTabsBar" style="display:none; background:#eff6ff; border-left:3px solid var(--blue);"></div>
+
+        <div class="filter-bar" id="orderFilterBar" style="display:none; background:#f8fafc; border-left:3px solid var(--gold);">
+            <div class="order-filter-container">
+                <div class="order-filter-row">
+                    <button class="btn-clear" onclick="selectAllOrders()" id="selectAllBtn" style="border: 1px solid var(--blue); color: var(--blue); background: #eff6ff; width: 80px;">Select All</button>
+                    <select id="orderStatusFilter" onchange="applyFilters()" style="flex: 1; min-width: 100px;">
+                        <option value="">All Status</option>
+                        <option value="Pending">⏳ Pending</option>
+                        <option value="Confirmed">✅ Confirmed</option>
+                        <option value="Shipped">🚚 Shipped</option>
+                        <option value="Delivered">🎉 Delivered</option>
+                        <option value="Cancelled">❌ Cancelled</option>
+                    </select>
+                    <input type="text" id="searchInp" placeholder="Search ID, Phone..." onkeyup="applyFilters()" style="flex: 2; min-width: 130px;">
+                    <button class="btn-action" style="background:var(--dark); margin-left:5px;" onclick="openScanner()">📷 Scan QR</button>
+                    <button class="btn-action" style="background:var(--green); margin-left:5px;" onclick="exportDataCSV('Orders')">📥 CSV</button>
+                    <button class="btn-action" style="background:var(--red); margin-left:5px;" onclick="exportTablePDF('Orders')">📄 PDF</button>
+                </div>
+                <div class="order-filter-row">
+                    <input type="date" id="fFrom" onchange="applyFilters()" style="flex: 1;"> 
+                    <span style="font-size:12px; font-weight:bold; color:#64748b;">to</span> 
+                    <input type="date" id="fTo" onchange="applyFilters()" style="flex: 1;">
+                    <button class="btn-clear" onclick="resetFilters()">Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-bar" id="tableFilterBar" style="display:none; background:#f0f9ff; border-left:3px solid var(--blue);">
+            <b style="color:var(--dark); font-size:12px;">🔍 Search:</b>
+            
+            <input type="date" id="tFrom" onchange="applyTableFilter()" style="display:none; max-width: 120px;">
+            <input type="date" id="tTo" onchange="applyTableFilter()" style="display:none; max-width: 120px;">
+            
+            <input type="text" id="searchInpTable" placeholder="Search..." onkeyup="applyTableFilter()" style="flex:1;">
+            <button class="btn-clear" onclick="document.getElementById('searchInpTable').value=''; document.getElementById('tFrom').value=''; document.getElementById('tTo').value=''; applyTableFilter();">Clear</button>
+            
+            <button class="btn-action" style="background:var(--green); display:none;" id="bulkApproveProdBtn" onclick="executeBulkApprove()">✅ Approve Selected</button>
+            <button class="btn-action" style="background:var(--red); display:none;" id="bulkDeleteBtn" onclick="executeFrontendBulkDelete()">🗑️ Delete Selected</button>
+            
+            <button class="btn-action" style="background:var(--green); margin-left:8px;" onclick="exportDataCSV(currentTab)">📥 CSV</button>
+            <button class="btn-action" style="background:var(--red); margin-left:8px;" onclick="exportTablePDF(currentTab)">📄 PDF</button>
+            <button class="btn-action" onclick="openModal('ADD')" id="genericAddBtn" style="margin-left:8px; display:inline-block;">➕ Add</button>
+        </div>
+
+        <div class="filter-bar" id="accountsFilterBar" style="display:none; justify-content: flex-end; background:#fefce8; border-left:3px solid var(--gold);">
+            <button class="btn-action" style="background:var(--blue);" onclick="openPaymentModal()" id="makePaymentBtn">➕ MAKE PAYMENT</button>
+        </div>
+
+        <div class="filter-bar" id="allowanceFilterBar" style="display:none; justify-content: flex-end; background:#fefce8; border-left:3px solid var(--blue);">
+            <button class="btn-action" style="background:var(--green);" onclick="openAllowanceModal()">➕ ADD ALLOWANCE</button>
+        </div>
+
+        <div class="filter-bar" id="stockFilterBar" style="display:none; background:#f8fafc; border-left:3px solid var(--blue);">
+            <b style="color:var(--dark); font-size:12px;">📊 Finance & Stock:</b>
+            <select id="stockSort" onchange="applyStockFilter()"><option value="none">Sort By</option><option value="low">Low Stock</option><option value="high">High Stock</option><option value="best">Best Sellers</option></select>
+            <select id="stockCondition" onchange="applyStockFilter()"><option value="none">Condition</option><option value="below">Below (<)</option><option value="above">Above (>)</option></select>
+            <input type="number" id="stockValInp" placeholder="Qty (e.g. 5)" onkeyup="applyStockFilter()" onkeypress="if(event.key === 'Enter') applyStockFilter();">
+            <button class="btn-clear" onclick="resetStockFilters()">Reset</button>
+            <button class="btn-action" style="background:var(--red); margin-left:auto;" onclick="exportFinancePDF()">📄 PDF</button>
+        </div>
+        
+        <div class="filter-bar" id="queryFilterBar" style="display:none; background:#fff7ed; border-left:3px solid var(--gold);">
+            <b style="color:var(--dark); font-size:12px;">💬 Status:</b>
+            <select id="queryStatusFilter" onchange="applyQueryFilter()">
+                <option value="">All</option>
+                <option value="Open">🟢 Open</option>
+                <option value="Closed">🔴 Closed</option>
+            </select>
+            <input type="text" id="querySearchInp" placeholder="Search ID..." onkeyup="applyQueryFilter()" style="flex:1;">
+            <button class="btn-clear" onclick="resetQueryFilters()">Clear</button>
+            <button class="btn-action" style="background:var(--green); margin-left:8px;" onclick="exportDataCSV('Queries')">📥 CSV</button>
+            <button class="btn-action" style="background:var(--red); margin-left:8px;" onclick="exportTablePDF('Queries')">📄 PDF</button>
+        </div>
+
+        <div class="filter-bar" id="expenseActionBar" style="display:none; justify-content: flex-end; background:#fef2f2; border-left:3px solid var(--red);">
+            <button class="btn-action" style="background:var(--green); margin-right:8px;" onclick="exportDataCSV('Expenses')">📥 CSV</button>
+            <button class="btn-action" style="background:var(--red); margin-right:8px;" onclick="exportTablePDF('Expenses')">📄 PDF</button>
+            <button class="btn-action" style="background:var(--red);" onclick="openModal('ADD')">➕ Add Expense</button>
+        </div>
+    </div>
+
+    <div class="content-area">
+        <div id="dataContainer" class="cards-grid">
+            <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #64748b; font-size: 16px; font-weight: bold;">
+                Please Login to Access Panel 🔒
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div id="qrScannerModal" class="glass-modal">
+      <div class="modal-content" style="max-width: 400px; text-align: center;">
+          <h3 style="color:var(--dark); margin-top:0;">📷 Scan Order QR</h3>
+          <div id="reader" style="width: 100%; min-height: 250px;"></div>
+          <button onclick="closeScanner()" style="width:100%; background:var(--red); color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; margin-top:15px; cursor:pointer;">CLOSE SCANNER</button>
+      </div>
+  </div>
+
+  <div id="bulkActionBar">
+      <span id="bulkCount" style="font-weight:900; color:#cbd5e1; font-size: 14px; min-width: 90px; text-align: center;">0 Selected</span>
+      <select id="bulkStatus">
+          <option value="">Status...</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Shipped">Shipped</option>
+          <option value="Delivered">Delivered</option>
+          <option value="Cancelled">Cancelled</option>
+      </select>
+      <select id="bulkDboy">
+          <option value="">Assign Boy...</option>
+      </select>
+      <input type="text" id="bulkRem" placeholder="Remarks" onkeypress="if(event.key === 'Enter') submitBulkUpdate();">
+      <button onclick="submitBulkUpdate()" id="bulkUpdateBtn">UPDATE ALL</button>
+      
+      <div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.1); padding:4px 10px; border-radius:6px; margin-left: 5px;">
+          <label style="color:white; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;"><input type="checkbox" id="hideSlipPrice" style="margin:0;"> Hide Price</label> 
+          <label style="color:white; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;"><input type="checkbox" id="hideSlipQty" style="margin:0;"> Hide Qty</label> 
+          <button onclick="printSelectedSlips()" style="background:#8b5cf6; color:white; border:none; padding: 6px 12px; border-radius:4px; cursor:pointer; font-weight:bold; margin-left:5px;">🖨️ Slips</button>
+      </div>
+      <button onclick="closeBulkBar()" style="background:transparent; border:1px solid #64748b; color:#cbd5e1; padding: 4px 8px; margin-left:5px;">X</button>
+  </div>
+
+  <div id="crudModal" class="glass-modal">
+    <div class="modal-content">
+      <h3 id="modalTitle">Add / Edit Data</h3>
+      <div id="modalBody"></div>
+      <div style="display:flex; gap:12px; margin-top:20px;">
+        <button onclick="saveCrudData()" id="modalSaveBtn" style="flex:1; background:var(--green); color:white; padding:12px; border:none; border-radius:6px; font-weight:bold; font-size:14px; cursor:pointer;">💾 SAVE</button>
+        <button onclick="document.getElementById('crudModal').style.display='none'" style="flex:1; background:#94a3b8; color:white; padding:12px; border:none; border-radius:6px; font-weight:bold; font-size:14px; cursor:pointer;">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="paymentModal" class="glass-modal">
+      <div class="modal-content" style="max-width: 500px;">
+          <h3 id="paymentModalTitle" style="color:var(--blue); text-align:center; border-bottom:1px solid #eee; padding-bottom:10px;">Make Payout</h3>
+          <div style="text-align:center; margin-bottom:15px;">
+              <span style="font-size:12px; color:#666;">Paying to:</span><br>
+              <b id="payToNameDisplay" style="font-size:18px; color:var(--dark);">Select User Below</b>
+          </div>
+          <div class="form-group"><label>Select Role</label><select class="form-input" id="uPayRoleSel" onchange="filterPaymentUsers()"><option value="">-- Choose Role --</option><option value="Vendor">Vendor</option><option value="Staff">Staff</option><option value="Delivery Boy">Delivery Boy</option></select></div>
+          <div class="form-group"><label>Select User (ID - Name)</label><select class="form-input" id="uPayUserSel" onchange="updatePayNameDisplay()"><option value="">-- First Select Role --</option></select></div>
+          <div class="form-group"><label>Amount to Pay (₹)</label><input class="form-input" id="uPayAmt" type="number" placeholder="e.g. 5000"></div>
+          <div class="form-group"><label>Payment Mode</label><select class="form-input" id="uPayModeMethod"><option value="Bank Transfer">Bank Transfer (NEFT/IMPS)</option><option value="UPI">UPI (GPay/PhonePe)</option><option value="Cash">Cash</option></select></div>
+          <div class="form-group"><label>Transaction ID / UTR</label><input class="form-input" id="uPayTxnId" placeholder="e.g. TXN987654321"></div>
+          <div class="form-group"><label>Billing Period</label><input class="form-input" id="uPayBillPeriod" placeholder="e.g. April 2026"></div>
+          <div class="form-group"><label>Remarks</label><input class="form-input" id="uPayRemarks" placeholder="Optional notes"></div>
+          <div style="display:flex; gap:12px; margin-top:20px;">
+              <button id="submitPayBtn" onclick="submitLedgerPayment()" style="flex:1; background:var(--blue); color:#fff; border:none; padding:12px; border-radius:6px; font-weight:bold; font-size:14px; cursor:pointer;">CONFIRM PAYMENT</button>
+              <button onclick="document.getElementById('paymentModal').style.display='none'" style="flex:1; background:#94a3b8; color:white; padding:12px; border:none; border-radius:6px; font-weight:bold; font-size:14px; cursor:pointer;">CANCEL</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="allowanceModal" class="glass-modal">
+      <div class="modal-content" style="max-width: 500px;">
+          <h3 style="color:var(--green); text-align:center; border-bottom:1px solid #eee; padding-bottom:10px;">Add Allowance / Salary</h3>
+          <div class="form-group"><label>Select Role</label><select class="form-input" id="alwRoleSel" onchange="filterAllowanceUsers()"><option value="">-- Choose Role --</option><option value="Staff" id="alwStaffOpt">Staff</option><option value="Delivery Boy">Delivery Boy</option></select></div>
+          <div class="form-group"><label>Select User</label><select class="form-input" id="alwUserSel"></select></div>
+          <div class="form-group"><label>Amount (₹)</label><input class="form-input" id="alwAmt" type="number" placeholder="e.g. 500"></div>
+          <div class="form-group"><label>Description / Reason</label><input class="form-input" id="alwDesc" placeholder="e.g. Monthly Salary, Bonus, Fuel etc."></div>
+          <div style="display:flex; gap:12px; margin-top:20px;">
+              <button id="submitAlwBtn" onclick="submitAllowance()" style="flex:1; background:var(--green); color:#fff; border:none; padding:12px; border-radius:6px; font-weight:bold; font-size:14px; cursor:pointer;">SAVE ALLOWANCE</button>
+              <button onclick="document.getElementById('allowanceModal').style.display='none'" style="flex:1; background:#94a3b8; color:white; padding:12px; border:none; border-radius:6px; font-weight:bold; font-size:14px; cursor:pointer;">CANCEL</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="sessionWarningModal" class="glass-modal" style="z-index: 30000;">
+      <div class="modal-content" style="max-width: 320px; text-align: center; padding: 30px;">
+          <h3 style="color:var(--red); margin-top:0; font-size:18px;">⚠️ Session Expiring!</h3>
+          <p style="font-size:14px; color:#333; line-height:1.5;">Your secure session will expire in <br><span id="sessionCountdown" style="font-size:24px; font-weight:bold; color:var(--red);">30</span> seconds.</p>
+          <button onclick="extendSession()" style="background:var(--green); color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%; margin-top:10px; font-size:14px;">Keep Me Logged In</button>
+      </div>
+  </div>
+
+  <div id="adminToast">Message</div>
+  
+  <div id="customConfirm">
+      <div class="confirm-box">
+          <div style="font-size:40px; margin-bottom:10px;">⚠️</div>
+          <h3 id="confirmText">Are you sure?</h3>
+          <div class="confirm-btns">
+              <button onclick="executeConfirm()" style="flex:1; background:var(--red); color:white; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">DELETE</button>
+              <button onclick="closeConfirm()" style="flex:1; background:#94a3b8; color:white; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">CANCEL</button>
+          </div>
+      </div>
+  </div>
+
+  <script>
+    var API = "https://script.google.com/macros/s/AKfycbzOvqc2Np_yS8NBrZTgKKwkJ7hONUpKLwfn489qgaZ1F0zf2VTGrW582qX2dtpdNZ5s/exec"; 
+    
+    var userRole = ""; var userName = ""; var currentTab = "Orders"; var globalData = []; var currentHeaders = []; var crudAction = "ADD"; var currentQuickStatus = ""; var deliveryBoysList = []; var rawOrderData = []; var expenseData = []; var currentEditId = ""; var confirmActionCallback = null; var allSystemUsers = []; 
+
+    var SESSION_LIMIT_MS = 60 * 60 * 1000; var WARNING_TIME_MS = 30 * 1000; var sessionTimer; var warningTimer; var countdownInterval;
+
+    function startSessionTimer() {
+        clearTimeout(sessionTimer); clearTimeout(warningTimer); clearInterval(countdownInterval);
+        warningTimer = setTimeout(showSessionWarning, SESSION_LIMIT_MS - WARNING_TIME_MS);
+        sessionTimer = setTimeout(forceLogout, SESSION_LIMIT_MS);
+    }
+
+    function showSessionWarning() {
+        document.getElementById('sessionWarningModal').style.display = 'flex';
+        var timeLeft = Math.floor(WARNING_TIME_MS / 1000);
+        document.getElementById('sessionCountdown').innerText = timeLeft;
+        countdownInterval = setInterval(function() {
+            timeLeft--; document.getElementById('sessionCountdown').innerText = timeLeft;
+            if(timeLeft <= 0) clearInterval(countdownInterval);
+        }, 1000);
+    }
+
+    function extendSession() {
+        document.getElementById('sessionWarningModal').style.display = 'none';
+        showToast("Session extended!", "success"); startSessionTimer();
+    }
+
+    function forceLogout() {
+        document.getElementById('sessionWarningModal').style.display = 'none'; logoutAdmin(); showToast("Session expired for security!", "error");
+    }
+
+    var html5QrcodeScanner = null;
+    function openScanner() {
+        document.getElementById('qrScannerModal').style.display = 'flex';
+        if(typeof Html5QrcodeScanner !== 'undefined') {
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+            html5QrcodeScanner.render(function(decodedText, decodedResult) {
+                document.getElementById("searchInp").value = decodedText; applyFilters(); closeScanner(); showToast("✅ Order Scanned: " + decodedText, "success");
+            }, function(error) {});
+        } else { showToast("Scanner library loading... Please wait.", "error"); }
+    }
+
+    function closeScanner() {
+        document.getElementById('qrScannerModal').style.display = 'none';
+        if(html5QrcodeScanner) { html5QrcodeScanner.clear().catch(error => { console.error("Failed to clear scanner.", error); }); }
+    }
+
+    window.onload = function() {
+        var sessionStr = localStorage.getItem("arus_admin_session"); var savedId = localStorage.getItem("arus_saved_id");
+        if(savedId) { document.getElementById("lUserId").value = savedId; document.getElementById("rememberMeCb").checked = true; }
+        
+        if(sessionStr) {
+            var s = JSON.parse(sessionStr); userRole = s.role; userName = s.name;
+            document.getElementById("uNameDispSide").innerText = userName + " (" + userRole + ")";
+            document.getElementById("welcomeHeaderMsg").innerText = "Welcome back, " + userName;
+            document.getElementById("welcomeHeaderMsg").style.display = "block";
+            document.getElementById("loginScreen").style.display = "none";
+            startSessionTimer();
+            
+            if (userRole === "Vendor") {
+                ["tabFinExp", "tabVendors", "tabPromo", "tabUserRev"].forEach(function(t) { var e = document.getElementById(t); if(e) e.style.display="none"; });
+                document.getElementById("tabEarnings").style.display = "block"; 
+                document.getElementById("sidebarTitle").innerText = "Vendor Dashboard";
+                setTimeout(function(){ switchTab('Orders', document.querySelector('#tabOrders')); }, 200);
+            } else if(userRole === "Delivery Boy") {
+                ["tabProd", "tabFinExp", "tabVendors", "tabPromo", "tabUserRev"].forEach(function(t) { var e = document.getElementById(t); if(e) e.style.display="none"; });
+                document.getElementById("tabEarnings").style.display = "block"; 
+                setTimeout(function(){ switchTab('Orders', document.querySelector('#tabOrders')); }, 200);
+            } else if (userRole === "Staff") {
+                ["tabUserRev", "tabVendors"].forEach(function(t) { var e = document.getElementById(t); if(e) e.style.display="none"; });
+                var earn = document.getElementById("tabEarnings"); if(earn) earn.style.display="none";
+                fetchDeliveryBoysAndLoad();
+            } else { fetchDeliveryBoysAndLoad(); }
+        }
+
+        if(typeof google === 'undefined') {
+            fetch(API + "?action=getCompanyDetails").then(r => r.json()).then(function(data) {
+                if(data && data.MAIN_LOGO) { 
+                    document.getElementById("loginLogoObj").src = data.MAIN_LOGO; var tLogo = document.getElementById("topCenterLogo"); if(tLogo) tLogo.src = data.MAIN_LOGO;
+                    document.getElementById("sidebarTitle").innerText = data.NAME; 
+                }
+            }).catch(e => console.log("Logo fetch failed"));
+        } else {
+             google.script.run.withSuccessHandler(function(data) {
+                if(data && data.MAIN_LOGO) { 
+                    document.getElementById("loginLogoObj").src = data.MAIN_LOGO; var tLogo = document.getElementById("topCenterLogo"); if(tLogo) tLogo.src = data.MAIN_LOGO;
+                    document.getElementById("sidebarTitle").innerText = data.NAME; 
+                }
+             }).getCompanyDetails();
+        }
+    };
+
+    function handleLoginKey(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            if (e.target.id === 'lUserId') { document.getElementById('lPass').focus(); } 
+            else if (e.target.id === 'lPass') { document.getElementById('loginBtn').click(); }
+        }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            var m = document.getElementById('crudModal');
+            if (m && m.style.display === 'flex' && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) {
+                e.preventDefault(); 
+                var inputs = Array.from(m.querySelectorAll('input:not([type="file"]), select')); var idx = inputs.indexOf(e.target);
+                if (idx > -1 && idx < inputs.length - 1) { inputs[idx + 1].focus(); } 
+                else if (idx === inputs.length - 1) { document.getElementById('modalSaveBtn').click(); }
+            }
+        }
+    });
+
+    setInterval(function() {
+        var clock = document.getElementById('liveClock');
+        if(clock) { var d = new Date(); clock.innerText = d.toLocaleDateString('en-IN', {weekday: 'short', day: '2-digit', month: 'short'}) + " | " + d.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'}); }
+    }, 1000);
+
+    function showToast(msg, type) {
+        if(!type) type = "success"; var t = document.getElementById("adminToast");
+        t.innerText = msg; t.className = "show " + type; 
+        setTimeout(function() { t.className = t.className.replace("show", "").trim(); }, 3000);
+    }
+
+    function togglePass() { var p = document.getElementById("lPass"); var e = document.getElementById("eyeIcon"); if (p.type === "password") { p.type = "text"; e.innerText = "🙈"; } else { p.type = "password"; e.innerText = "👁️"; } }
+    
+    function showConfirm(msg, callback) { document.getElementById("confirmText").innerText = msg; document.getElementById("customConfirm").style.display = "flex"; confirmActionCallback = callback; }
+    function closeConfirm() { document.getElementById("customConfirm").style.display = "none"; }
+    function executeConfirm() { closeConfirm(); if(confirmActionCallback) { confirmActionCallback(); } }
+
+    function doLogin() {
+      var id = document.getElementById("lUserId").value.trim(); var pass = document.getElementById("lPass").value.trim(); var rememberChecked = document.getElementById("rememberMeCb").checked;
+      var btn = document.getElementById("loginBtn"); var msg = document.getElementById("loginMsg");
+      
+      if(!id || !pass) { msg.innerText = "⚠️ Enter ID and Password!"; return; }
+      msg.innerText = ""; btn.innerText = "⏳ VERIFYING..."; btn.disabled = true;
+
+      if(rememberChecked) { localStorage.setItem("arus_saved_id", id); } else { localStorage.removeItem("arus_saved_id"); }
+
+      google.script.run.withSuccessHandler(function(res) {
+          if(res.success) {
+            userRole = res.role; userName = res.name; localStorage.setItem("arus_admin_session", JSON.stringify({role: userRole, name: userName}));
+            document.getElementById("uNameDispSide").innerText = userName + " (" + userRole + ")"; document.getElementById("welcomeHeaderMsg").innerText = "Welcome back, " + userName;
+            document.getElementById("welcomeHeaderMsg").style.display = "block"; document.getElementById("loginScreen").style.display = "none"; startSessionTimer(); 
+            
+            if (userRole === "Vendor") {
+                ["tabFinExp", "tabVendors", "tabPromo", "tabUserRev"].forEach(function(t) { var e = document.getElementById(t); if(e) e.style.display="none"; });
+                document.getElementById("tabEarnings").style.display = "block"; document.getElementById("sidebarTitle").innerText = "Vendor Dashboard"; switchTab('Orders', document.querySelector('#tabOrders'));
+            } else if(userRole === "Delivery Boy") {
+                ["tabProd", "tabFinExp", "tabVendors", "tabPromo", "tabUserRev"].forEach(function(t) { var e = document.getElementById(t); if(e) e.style.display="none"; });
+                document.getElementById("tabEarnings").style.display = "block"; switchTab('Orders', document.querySelector('#tabOrders'));
+            } else if (userRole === "Staff") {
+                ["tabUserRev", "tabVendors"].forEach(function(t) { var e = document.getElementById(t); if(e) e.style.display="none"; });
+                var earn = document.getElementById("tabEarnings"); if(earn) earn.style.display="none"; fetchDeliveryBoysAndLoad();
+            } else { fetchDeliveryBoysAndLoad(); }
+          } else { btn.innerText = "LOGIN SECURELY"; btn.disabled = false; msg.innerText = res.message; }
+      }).withFailureHandler(function(err) { btn.innerText = "LOGIN SECURELY"; btn.disabled = false; msg.innerText = "⚠️ Network error! Check connection."; }).verifyAdminLogin(id, pass);
+    }
+
+    function logoutAdmin() {
+        clearTimeout(sessionTimer); clearTimeout(warningTimer); clearInterval(countdownInterval); localStorage.removeItem("arus_admin_session");
+        if(!document.getElementById("rememberMeCb").checked) { document.getElementById("lUserId").value = ""; }
+        document.getElementById("lPass").value = ""; document.getElementById("loginMsg").innerText = ""; userRole = ""; userName = "";
+        document.getElementById("loginScreen").style.display = "flex"; document.getElementById("welcomeHeaderMsg").style.display = "none"; 
+        closeBulkBar(); var btn = document.getElementById("loginBtn"); btn.innerText = "LOGIN SECURELY"; btn.disabled = false;
+    }
+
+    function fetchDeliveryBoysAndLoad() {
+        var container = document.getElementById("dataContainer"); container.innerHTML = "<div style='text-align:center; padding:40px; color:#64748b;'><b>Connecting to System...</b> ⏳</div>";
+        google.script.run.withFailureHandler(function(err) {
+            container.innerHTML = "<div style='text-align:center; padding:40px; color:red;'><b>Connection Error: " + err.message + "</b></div>";
+            setTimeout(function() { switchTab('Orders', document.querySelector('.menu-btn.active')); }, 2000);
+        }).withSuccessHandler(function(users) {
+            try {
+                if(users && Array.isArray(users)) {
+                    allSystemUsers = users; deliveryBoysList = users.filter(u => u.Role && u.Role.toString().toLowerCase().includes('delivery')).map(u => u.Name);
+                    var bSel = document.getElementById("bulkDboy");
+                    if(bSel) { var opts = '<option value="">Assign Boy...</option>'; deliveryBoysList.forEach(function(db) { opts += '<option value="' + db + '">' + db + '</option>'; }); bSel.innerHTML = opts; }
+                }
+            } catch(e) { console.error(e); }
+            switchTab('Orders', document.querySelector('.menu-btn.active'));
+        }).getAdminData('users', userRole, userName); 
+    }
+    
+    function openCombinedTab(group, btn) {
+        document.querySelectorAll('.menu-btn').forEach(function(b) { b.classList.remove('active'); }); if(btn) btn.classList.add('active');
+        document.getElementById('sidebar').classList.remove('open'); var sub = document.getElementById("subTabsBar"); sub.style.display = "flex";
+        
+        if(group === 'PromoTools') {
+            sub.innerHTML = '<button class="status-pill active" onclick="switchTab(\'Coupons\', this)">🎟️ Coupons</button><button class="status-pill" onclick="switchTab(\'Pincodes\', this)">📍 Pincodes</button><button class="status-pill" onclick="switchTab(\'Queries\', this)">💬 Queries</button><button class="status-pill" onclick="switchTab(\'Wheel_Settings\', this)">🎡 Spin Wheel</button><button class="status-pill" onclick="switchTab(\'Spin_Tracking\', this)">🎯 Spin Tracking</button>';
+            switchTab('Coupons', null); 
+        } else if (group === 'UserRev') {
+            var html = ''; if(userRole === 'Admin') html += '<button class="status-pill active" onclick="switchTab(\'Users\', this)">👥 Users</button>';
+            sub.innerHTML = html; switchTab('Users', null);
+        } else if (group === 'FinanceExp') {
+            var accBtn = userRole === 'Staff' ? '' : '<button class="status-pill" onclick="switchTab(\'Accounts\', this)">💰 Payouts Ledger</button>';
+            sub.innerHTML = '<button class="status-pill active" onclick="switchTab(\'Stock\', this)">📊 Finance & Stock</button><button class="status-pill" onclick="switchTab(\'Expenses\', this)">💸 Expenses</button><button class="status-pill" onclick="switchTab(\'Allowances\', this)">🎁 Allowances</button>' + accBtn;
+            switchTab('Stock', null);
+        }
+    }
+
+    function switchTab(sheet, btn) {
+      if(btn && btn.classList.contains('menu-btn')) {
+          document.querySelectorAll('.menu-btn').forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active');
+          document.getElementById('sidebar').classList.remove('open'); document.getElementById('subTabsBar').style.display = "none";
+      } else if(btn && btn.classList.contains('status-pill') && btn.parentElement.id === 'subTabsBar') {
+          document.querySelectorAll('#subTabsBar .status-pill').forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active');
+      }
+      
+      currentTab = sheet; closeBulkBar(); currentQuickStatus = "";
+      var filterBars = ["orderFilterBar", "stockFilterBar", "tableFilterBar", "queryFilterBar", "expenseActionBar", "accountsFilterBar", "allowanceFilterBar", "statusTabs"];
+      filterBars.forEach(function(barId) { var el = document.getElementById(barId); if (el) el.style.display = "none"; });
+      document.getElementById("statusTabs").innerHTML = "";
+
+      if (sheet === "Orders") {
+          document.getElementById("orderFilterBar").style.display = "flex";
+          var sBtn = document.getElementById("selectAllBtn"); if(userRole !== "Delivery Boy" && userRole !== "Vendor" && sBtn) { sBtn.style.display = "inline-block"; } else if(sBtn) { sBtn.style.display = "none"; }
+      } 
+      else if (sheet === "Products" || sheet === "Vendors" || sheet === "Users" || sheet === "Coupons" || sheet === "Pincodes" || sheet === "Wheel_Settings" || sheet === "Spin_Tracking" || sheet === "Allowances" || sheet === "Expenses") {
+          document.getElementById("tableFilterBar").style.display = "flex";
+          var bulkProdBtn = document.getElementById("bulkApproveProdBtn"); if(bulkProdBtn) bulkProdBtn.style.display = "none";
+          document.getElementById("genericAddBtn").style.display = "inline-block";
+
+          if (sheet === "Products" || sheet === "Vendors") {
+              document.getElementById("statusTabs").style.display = "flex";
+              var tabsHTML = '<button class="status-pill active" onclick="quickFilterTable(\'\', this)">All</button><button class="status-pill" onclick="quickFilterTable(\'Pending\', this)">⏳ Pending</button><button class="status-pill" onclick="quickFilterTable(\'Active\', this)">✅ Active</button>';
+              if(sheet === "Products" && userRole !== "Vendor") { tabsHTML += '<button class="status-pill" onclick="quickFilterTable(\'Vendor\', this)">🏪 Vendor Items</button>'; }
+              document.getElementById("statusTabs").innerHTML = tabsHTML;
+          }
+          
+          if(sheet === "Allowances") {
+              document.getElementById("statusTabs").style.display = "flex";
+              var tabsHTML = '<button class="status-pill active" onclick="quickFilterTable(\'\', this)">All</button><button class="status-pill" onclick="quickFilterTable(\'Pending\', this)">⏳ Pending</button><button class="status-pill" onclick="quickFilterTable(\'Approved\', this)">✅ Approved</button>';
+              document.getElementById("statusTabs").innerHTML = tabsHTML;
+              document.getElementById("genericAddBtn").style.display = "none"; document.getElementById("allowanceFilterBar").style.display = "flex"; 
+          }
+
+          if(sheet === 'Products') { document.getElementById("genericAddBtn").innerText = '➕ Add Product'; } 
+          else if(sheet === 'Vendors') { document.getElementById("genericAddBtn").innerText = '➕ Add Vendor'; } 
+          else if(sheet === 'Users') { document.getElementById("genericAddBtn").innerText = '➕ Add User'; } 
+          else if(sheet === 'Expenses') { document.getElementById("genericAddBtn").innerText = '➕ Add Expense'; } 
+          else { document.getElementById("genericAddBtn").innerText = '➕ Add Record'; }
+          
+          if(sheet === 'Spin_Tracking' || sheet === 'Expenses') {
+              document.getElementById("tFrom").style.display = "inline-block"; document.getElementById("tTo").style.display = "inline-block";
+          } else {
+              var fFrom = document.getElementById("tFrom"); if(fFrom) {fFrom.style.display = "none"; fFrom.value="";}
+              var fTo = document.getElementById("tTo"); if(fTo) {fTo.style.display = "none"; fTo.value="";}
+          }
+      }
+      else if (sheet === "Stock") { document.getElementById("stockFilterBar").style.display = "flex"; }
+      else if (sheet === "Queries") { document.getElementById("queryFilterBar").style.display = "flex"; }
+      else if (sheet === "Accounts") { 
+          document.getElementById("accountsFilterBar").style.display = "flex"; 
+          if(userRole === "Vendor" || userRole === "Delivery Boy") { document.getElementById("makePaymentBtn").style.display = "none"; } else { document.getElementById("makePaymentBtn").style.display = "inline-block"; }
+      }
+      
+      var dataContainer = document.getElementById("dataContainer");
+      dataContainer.className = (sheet === "Orders" || sheet === "Queries" || sheet === "Accounts" || sheet === "Allowances") ? "cards-grid" : "";
+      dataContainer.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:40px; color:#64748b;'><b>Fetching " + sheet + "...</b> ⏳</div>";
+      
+      var apiSheetName = sheet.toLowerCase();
+
+      function handleErr(err) { document.getElementById("dataContainer").innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:40px; color:var(--red);'><b>Error Loading Data: " + err.message + "</b></div>"; }
+
+      if (sheet === "Stock") {
+          google.script.run.withFailureHandler(handleErr).withSuccessHandler(function(pData) {
+              globalData = pData || []; 
+              google.script.run.withFailureHandler(handleErr).withSuccessHandler(function(oData) { 
+                  rawOrderData = oData || []; 
+                  google.script.run.withFailureHandler(handleErr).withSuccessHandler(function(eData) {
+                      expenseData = eData || []; generateFinanceDashboard(); 
+                  }).getAdminData('expenses', userRole, userName);
+              }).getAdminData('orders', userRole, userName);
+          }).getAdminData('products', userRole, userName);
+      } 
+      else if (sheet === "Accounts") {
+          google.script.run.withFailureHandler(handleErr).withSuccessHandler(function(res) {
+              if(res.status === "success") { renderAccounts(res.data); } else { handleErr({message: res.message}); }
+          }).getLedgerData(userRole, userName);
+          google.script.run.withSuccessHandler(function(uData){ allSystemUsers = uData; }).getAdminData('users', userRole, userName);
+      }
+      else if (sheet === "Allowances") {
+          google.script.run.withFailureHandler(handleErr).withSuccessHandler(function(data) {
+              globalData = data.reverse(); applyTableFilter(); 
+              google.script.run.withSuccessHandler(function(uData){ allSystemUsers = uData; }).getAdminData('users', userRole, userName);
+          }).getAdminData(apiSheetName, userRole, userName);
+      }
+      else {
+          google.script.run.withFailureHandler(handleErr).withSuccessHandler(function(data) {
+              try {
+                  if(!data || !Array.isArray(data)) data = [];
+                  globalData = data.reverse ? data.reverse() : []; 
+                  currentHeaders = getHeadersFallback(apiSheetName);
+                  if(sheet === "Products") { currentHeaders = currentHeaders.filter(h => h.trim().toLowerCase() !== "reviews"); }
+                  if(sheet === "Orders") { rawOrderData = globalData; applyFilters(); } 
+                  else if(sheet === "Queries") { renderQueries(globalData); } 
+                  else { applyTableFilter(); }
+              } catch (e) { handleErr(e); }
+          }).getAdminData(apiSheetName, userRole, userName);
+      }
+    }
+
+    function getHeadersFallback(s) {
+      var m = { 
+        "orders":["OrderID","Date","Name","Phone","Address","Pincode","Items","Amount","Coupon Code","Coupon Discount","Delivery Charge","Total","Status","DeliveryBoy","Remarks","Payment Mode","Custom Note","ConfTim","DelTime","CanTime","DeliveryBoy Remarks","Updated By","Delivery OTP"],
+        "products":["ID","Name","Category","Cost Price","Price","MRP","Stock","Images","Rating","Vendor","Status"], 
+        "pincodes":["Pincode","Charge","Min Order"], 
+        "users":["UserID","Password","Role","Name","Status"],
+        "expenses":["Expense ID","Date","Category","Amount","Description"],
+        "queries":["Query ID","Date","Name","Phone","Subject","Message","Status","Admin Remarks"],
+        "coupons":["Code","Type","Value","Category Target","MinOrder","Max Discount","Usage Limit","Used Count","Expiry Date","Status"], 
+        "wheel_settings":["Slice No","Prize Name","Coupon Code","Winning Chance (%)"], 
+        "spin_tracking":["Date & Time","Phone","Prize Won","Coupon Given","Status","Expiry Date"],
+        "vendors":["Vendor ID","Store Name","Owner Name","Phone","Pin Code","Commission (%)","Min Fee","Status","Join Date"],
+        "allowances":["Allowance ID", "Date", "Role", "User ID", "Name", "Amount", "Description", "Added By", "Status"]
+      }; 
+      return m[s] || (globalData.length > 0 ? Object.keys(globalData[0]) : []);
+    }
+
+    // =========================================================
+    // 📊 FINANCE & STOCK DASHBOARD LOGIC
+    // =========================================================
+    function generateFinanceDashboard() {
+        var totalSales = 0, totalOrders = 0, totalExpense = 0, totalCost = 0;
+        
+        rawOrderData.forEach(function(o) {
+            if (o['Status'] === 'Delivered') {
+                totalSales += parseFloat(o['Total']) || 0;
+                totalOrders++;
+                
+                var itemsStr = o['Items'] || "";
+                var itemsArr = itemsStr.split(", ");
+                itemsArr.forEach(function(str) {
+                    var lastIdx = str.lastIndexOf("(x");
+                    if(lastIdx !== -1) {
+                        var pName = str.substring(0, lastIdx).trim(); 
+                        var pQty = parseInt(str.substring(lastIdx + 2, str.length - 1)) || 1;
+                        var baseName = pName.indexOf(" - ") !== -1 ? pName.split(" - ")[0].trim() : pName;
+                        
+                        var prod = globalData.find(p => p['Name'] === baseName);
+                        if(prod) { totalCost += (parseFloat(prod['Cost Price']) || 0) * pQty; }
+                    }
+                });
+            }
+        });
+        
+        expenseData.forEach(function(e) { totalExpense += parseFloat(e['Amount']) || 0; });
+        var netProfit = totalSales - totalCost - totalExpense;
+        
+        var summaryHtml = '<div class="summary-box">' +
+            '<div class="sum-item"><div class="sum-label">Delivered Orders</div><div class="sum-val">' + totalOrders + '</div></div>' +
+            '<div class="sum-item"><div class="sum-label">Total Sales</div><div class="sum-val" style="color:var(--blue);">₹' + totalSales.toFixed(2) + '</div></div>' +
+            '<div class="sum-item"><div class="sum-label">Total Expenses</div><div class="sum-val" style="color:var(--red);">₹' + totalExpense.toFixed(2) + '</div></div>' +
+            '<div class="sum-item"><div class="sum-label">Net Profit</div><div class="sum-val" style="color:' + (netProfit >= 0 ? 'var(--green)' : 'var(--red)') + ';">₹' + netProfit.toFixed(2) + '</div></div>' +
+        '</div>';
+        
+        currentHeaders = ["ID", "Name", "Category", "Cost Price", "Price", "MRP", "Stock", "Status"];
+        applyStockFilter(summaryHtml);
+    }
+
+    function applyStockFilter(summaryHtml) {
+        var sortMode = document.getElementById("stockSort").value;
+        var condMode = document.getElementById("stockCondition").value;
+        var qtyVal = document.getElementById("stockValInp").value;
+        var filteredProds = globalData.slice();
+        
+        function getLowestStock(stockStr) {
+            if(!stockStr) return 0;
+            if(stockStr.toString().includes(":")) {
+                var min = 999999;
+                stockStr.toString().split(",").forEach(function(v) {
+                    var parts = v.split(":");
+                    var qty = parseInt(parts[parts.length-1]) || 0;
+                    if(qty < min) min = qty;
+                });
+                return min;
+            }
+            return parseInt(stockStr) || 0;
+        }
+        
+        if(condMode !== "none" && qtyVal !== "") {
+            var q = parseInt(qtyVal) || 0;
+            filteredProds = filteredProds.filter(function(p) {
+                var s = getLowestStock(p['Stock']);
+                if(condMode === "below") return s < q;
+                if(condMode === "above") return s > q;
+                return true;
+            });
+        }
+        
+        if(sortMode === "low") { filteredProds.sort((a, b) => getLowestStock(a['Stock']) - getLowestStock(b['Stock'])); } 
+        else if (sortMode === "high") { filteredProds.sort((a, b) => getLowestStock(b['Stock']) - getLowestStock(a['Stock'])); }
+        renderStockTable(filteredProds, summaryHtml || "");
+    }
+    
+    function resetStockFilters() {
+        document.getElementById("stockSort").value = "none"; document.getElementById("stockCondition").value = "none";
+        document.getElementById("stockValInp").value = ""; generateFinanceDashboard(); 
+    }
+
+    function renderStockTable(arr, summaryHtml) {
+        var container = document.getElementById("dataContainer");
+        if (!summaryHtml) { var existingSummary = container.querySelector('.summary-box'); summaryHtml = existingSummary ? existingSummary.outerHTML : ""; }
+        if(arr.length === 0) { container.innerHTML = summaryHtml + "<div style='text-align:center; padding:40px; color:#64748b;'><b>No stock data matches criteria!</b></div>"; return; }
+        
+        var html = summaryHtml + '<div class="table-responsive"><table class="data-table"><thead><tr>';
+        currentHeaders.forEach(function(h) { if(h === "Cost Price" && userRole !== "Admin") return; html += '<th>' + h + '</th>'; });
+        html += '</tr></thead><tbody>';
+        
+        arr.forEach(function(row) {
+            html += '<tr>';
+            currentHeaders.forEach(function(h) {
+                if(h === "Cost Price" && userRole !== "Admin") return; 
+                var val = row[h] || "";
+                if(h === 'Stock') { 
+                    var stockNum = parseInt(val) || 0;
+                    if(val.toString().includes(":")) { val = val.toString().replace(/,/g, "<br>"); } 
+                    else if(stockNum <= 5) { val = '<span style="color:white; background:var(--red); padding:2px 6px; border-radius:8px; font-size:10px;">' + val + ' Low</span>'; }
+                }
+                else if(h === 'Status') { var clr = val === 'Active' ? 'var(--green)' : 'var(--red)'; val = '<b style="color:' + clr + '">' + val + '</b>'; }
+                html += '<td>' + val + '</td>';
+            });
+            html += '</tr>';
+        }); 
+        container.innerHTML = html + '</tbody></table></div>';
+    }
+
+    function renderAccounts(arr) {
+        var container = document.getElementById("dataContainer");
+        if(arr.ledger.length === 0) { container.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:40px; color:#64748b;'><b>No Dues / Records Found.</b></div>"; return; }
+        var html = "";
+        arr.ledger.forEach(function(p) {
+            var statusColor = p.netDue > 0 ? "var(--red)" : (p.netDue < 0 ? "var(--blue)" : "var(--green)");
+            var statusText = p.netDue > 0 ? "TO PAY" : (p.netDue < 0 ? "ADVANCE" : "CLEARED");
+            html += '<div class="order-card" style="border-top-color:' + statusColor + ';">' +
+                '<div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px dashed #ccc; padding-bottom:8px;">' +
+                    '<b style="font-size:14px; color:var(--dark);">👤 ' + p.name + '</b><span class="badge" style="background:' + statusColor + ';">' + statusText + '</span>' +
+                '</div><div class="p-row"><b>Role:</b> ' + p.role + '</div><div class="p-row"><b>ID:</b> ' + p.userId + '</div><div class="p-row"><b>Pending Earned:</b> ₹' + p.pendingEarned + ' <small style="color:#888">(Not Cleared)</small></div><div class="p-row"><b>Cleared Earned:</b> ₹' + p.clearedEarned + '</div><div class="p-row"><b>Total Paid:</b> ₹' + p.totalPaid + '</div><div class="p-row" style="margin-top:10px; padding-top:10px; border-top:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">' +
+                    '<b style="color:' + statusColor + '; font-size:15px;">Due: ₹' + Math.abs(p.netDue) + '</b>';
+            if((userRole === 'Admin' || userRole === 'Staff') && p.netDue > 0) {
+                html += '<button class="btn-action" onclick="openPaymentModal(\'' + p.role + '\', \'' + p.userId + '\', \'' + p.name + '\')">PAY NOW</button>';
+            }
+            html += '</div></div>';
+        });
+        container.innerHTML = html;
+    }
+
+    function openPaymentModal(role, userId, name) {
+        document.getElementById('uPayRoleSel').value = role || ""; filterPaymentUsers(); 
+        if(userId) document.getElementById('uPayUserSel').value = userId; updatePayNameDisplay();
+        document.getElementById('uPayAmt').value = ""; document.getElementById('uPayTxnId').value = ""; document.getElementById('uPayRemarks').value = "";
+        var d = new Date(); document.getElementById('uPayBillPeriod').value = d.toLocaleString('default', { month: 'long' }) + " " + d.getFullYear();
+        document.getElementById('paymentModal').style.display = 'flex';
+    }
+
+    function filterPaymentUsers() {
+        var role = document.getElementById('uPayRoleSel').value; var sel = document.getElementById('uPayUserSel'); 
+        sel.innerHTML = '<option value="">-- Select User --</option>';
+        if(allSystemUsers && role) { allSystemUsers.filter(u => u.Role === role).forEach(u => { sel.innerHTML += `<option value="${u.UserID}" data-name="${u.Name}">${u.UserID} - ${u.Name}</option>`; }); }
+    }
+
+    function updatePayNameDisplay() {
+        var sel = document.getElementById('uPayUserSel');
+        if(sel.selectedIndex > 0) { document.getElementById('payToNameDisplay').innerText = sel.options[sel.selectedIndex].getAttribute('data-name'); } 
+        else { document.getElementById('payToNameDisplay').innerText = "Select User Below"; }
+    }
+
+    function submitLedgerPayment() {
+        var role = document.getElementById('uPayRoleSel').value; var uid = document.getElementById('uPayUserSel').value; var sel = document.getElementById('uPayUserSel');
+        var name = sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].getAttribute('data-name') : ""; 
+        var amt = document.getElementById('uPayAmt').value; var mode = document.getElementById('uPayModeMethod').value; var txn = document.getElementById('uPayTxnId').value; var period = document.getElementById('uPayBillPeriod').value; var rem = document.getElementById('uPayRemarks').value;
+
+        if(!role || !uid || !amt || amt <= 0) return showToast("❌ Please fill Role, User, and Amount!", "error");
+        var btn = document.getElementById('submitPayBtn'); btn.innerText = "SAVING..."; btn.disabled = true;
+        var pLoad = { action: "savePayment", payRole: role, userId: uid, payTo: name, payAmt: amt, payMode: mode, txnId: txn, billPeriod: period, remarks: rem, username: userName };
+
+        google.script.run.withSuccessHandler(function(res) {
+            if(res.status === "success") { showToast("✅ Payment Saved!", "success"); document.getElementById('paymentModal').style.display = 'none'; switchTab('Accounts', document.querySelector('.menu-btn.active')); } 
+            else { showToast("❌ " + res.message, "error"); }
+            btn.innerText = "CONFIRM PAYMENT"; btn.disabled = false;
+        }).withFailureHandler(function(err) { showToast("❌ Network Error", "error"); btn.innerText = "CONFIRM PAYMENT"; btn.disabled = false; }).doPost({postData: {contents: JSON.stringify(pLoad)}});
+    }
+
+    function openAllowanceModal() {
+        if(userRole === 'Staff') { document.getElementById('alwRoleSel').value = "Delivery Boy"; document.getElementById('alwStaffOpt').style.display = "none"; } 
+        else { document.getElementById('alwRoleSel').value = ""; document.getElementById('alwStaffOpt').style.display = "block"; }
+        filterAllowanceUsers(); document.getElementById('alwAmt').value = ""; document.getElementById('alwDesc').value = ""; document.getElementById('allowanceModal').style.display = 'flex';
+    }
+
+    function filterAllowanceUsers() {
+        var role = document.getElementById('alwRoleSel').value; var sel = document.getElementById('alwUserSel'); sel.innerHTML = '<option value="">-- Select User --</option>';
+        if(allSystemUsers && role) { allSystemUsers.filter(u => u.Role === role).forEach(u => { sel.innerHTML += `<option value="${u.UserID}" data-name="${u.Name}">${u.UserID} - ${u.Name}</option>`; }); }
+    }
+
+    function submitAllowance() {
+        var role = document.getElementById('alwRoleSel').value; var uid = document.getElementById('alwUserSel').value; var sel = document.getElementById('alwUserSel');
+        var name = sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].getAttribute('data-name') : ""; 
+        var amt = document.getElementById('alwAmt').value; var desc = document.getElementById('alwDesc').value;
+
+        if(!role || !uid || !amt) return showToast("❌ Please fill all fields!", "error");
+        var btn = document.getElementById('submitAlwBtn'); btn.innerText = "SAVING..."; btn.disabled = true;
+        var pLoad = { action: "saveAllowance", roleType: role, userId: uid, userName: name, amt: amt, desc: desc, username: userName, userRole: userRole };
+        
+        google.script.run.withSuccessHandler(function(res) {
+            if(res.status === "success") { showToast(res.message, "success"); document.getElementById('allowanceModal').style.display = 'none'; switchTab('Allowances', document.querySelector('.menu-btn.active')); } 
+            else { showToast(res.message, "error"); }
+            btn.innerText = "SAVE ALLOWANCE"; btn.disabled = false;
+        }).withFailureHandler(function(err) { showToast("❌ Network Error", "error"); btn.innerText = "SAVE ALLOWANCE"; btn.disabled = false; }).doPost({postData: {contents: JSON.stringify(pLoad)}});
+    }
+
+    function approveAllowance(id) {
+        showConfirm("Approve this allowance? It will be added to user's Cleared Balance.", function() {
+            showToast("Approving...", "success");
+            google.script.run.withSuccessHandler(function(msg) { showToast(msg, "success"); switchTab('Allowances', document.querySelector('.menu-btn.active')); }).bulkUpdateStatus("allowances", [id], "Approved", userName);
+        });
+    }
+
+    function renderAllowancesCards(arr) {
+        var container = document.getElementById("dataContainer");
+        if(arr.length === 0) { container.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:40px; color:#64748b;'><b>No Allowances Found.</b></div>"; return; }
+        var html = "";
+        arr.forEach(function(a) {
+            var st = a.Status || "Pending"; var bgClr = st === 'Approved' ? 'var(--green)' : 'var(--gold)';
+            html += '<div class="order-card" style="border-top-color:' + bgClr + ';">' +
+                '<div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px dashed #ccc; padding-bottom:8px;">' +
+                    '<b style="font-size:14px; color:var(--dark);">' + a['Allowance ID'] + '</b><span class="badge" style="background:' + bgClr + ';">' + st + '</span>' +
+                '</div><div class="p-row"><b>👤 To:</b> ' + a.Name + ' (' + a.Role + ')</div><div class="p-row"><b>💰 Amount:</b> ₹' + a.Amount + '</div><div class="p-row"><b>📝 Desc:</b> ' + a.Description + '</div><div class="p-row" style="font-size:11px; color:#888; margin-top:10px;">Added By: ' + a['Added By'] + '</div>';
+            if(st === 'Pending' && userRole === 'Admin') {
+                html += '<div style="margin-top:10px; padding-top:10px; border-top:1px solid #eee; text-align:center;"><button class="btn-action" style="width:100%; background:var(--green);" onclick="approveAllowance(\'' + a['Allowance ID'] + '\')">✅ APPROVE NOW</button></div>';
+            }
+            html += '</div>';
+        });
+        container.innerHTML = html;
+    }
+
+    function exportDataCSV(tabName) {
+        var dataToExport = tabName === 'Orders' ? rawOrderData : globalData; 
+        if(!dataToExport || dataToExport.length === 0) { showToast("No data to export", "error"); return; }
+        showToast("Generating CSV...", "success");
+        var headers = Object.keys(dataToExport[0]); var csvContent = headers.join(",") + "\n";
+        dataToExport.forEach(function(row) {
+            var rowArray = headers.map(function(h) { var cell = (row[h] || "").toString().replace(/"/g, '""'); return '"' + cell + '"'; });
+            csvContent += rowArray.join(",") + "\n";
+        });
+        var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); var link = document.createElement("a"); link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", "Arus_" + tabName + "_" + new Date().toLocaleDateString() + ".csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+    
+    function exportTablePDF(tabName) {
+        var dataToExport = tabName === 'Orders' ? rawOrderData : globalData; 
+        if(!dataToExport || dataToExport.length === 0) { showToast("No data to export", "error"); return; }
+        var printWindow = window.open('', '_blank'); var headers = Object.keys(dataToExport[0]).filter(h => h.toLowerCase() !== "reviews" && h.toLowerCase() !== "images");
+        var html = '<html><head><title>' + tabName + ' Report</title><style>body{font-family:Arial, sans-serif; margin:20px;}table{width:100%; border-collapse:collapse; font-size:11px;}th,td{border:1px solid #ddd; padding:6px; text-align:left; word-break: break-word;}th{background:#f4f4f4; text-transform:uppercase;}h2{text-align:center; color:#1e293b;}</style></head><body>';
+        html += '<h2>Arus Store - ' + tabName + ' Report</h2><p style="text-align:center; font-size:12px; color:#666;">Generated on: ' + new Date().toLocaleString() + '</p><table><thead><tr>';
+        headers.forEach(function(h) { html += '<th>' + h + '</th>'; }); html += '</tr></thead><tbody>';
+        dataToExport.forEach(function(row) { html += '<tr>'; headers.forEach(function(h) { html += '<td>' + (row[h] || "") + '</td>'; }); html += '</tr>'; });
+        html += '</tbody></table><script>window.onload=function(){window.print();}<\/script></body></html>';
+        printWindow.document.write(html); printWindow.document.close();
+    }
+
+    function printSelectedSlips() {
+        var checked = document.querySelectorAll('.order-cb:checked'); var oids = Array.from(checked).map(function(c) { return c.value; });
+        if(oids.length === 0) return showToast("Select orders to print!", "error");
+        
+        var hidePrice = document.getElementById('hideSlipPrice').checked; var hideQty = document.getElementById('hideSlipQty').checked; var logoSrc = document.getElementById("topCenterLogo").src;
+        var printWindow = window.open('', '_blank');
+        var html = '<html><head><title>Print Packaging Slips</title><style>' +
+            'body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fff; } @page { size: A4; margin: 10mm; } .page { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 10mm; height: 277mm; page-break-after: always; box-sizing: border-box; } .slip { border: 2px dashed #000; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative; } .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px; display: flex; flex-direction: column; align-items: center; } .header img.logo { max-height: 40px; margin-bottom: 5px; } .header img.qr { width: 50px; height: 50px; margin-left: auto; } .header h2 { margin: 0; font-size: 16px; text-transform: uppercase; } .content { flex: 1; font-size: 13px; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; } .items { margin-top: 8px; border-top: 1px solid #ccc; padding-top: 5px; font-size: 11px; word-wrap: break-word; word-break: break-word; white-space: normal; line-height: 1.3; } .footer { border-top: 2px solid #000; padding-top: 5px; margin-top: 5px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 11px; } .footer .tc { width: 60%; font-size: 9px; line-height: 1.3; color: #555; } .footer .sign { text-align: center; width: 35%; } .footer .sign-box { border: 1px dashed #999; height: 35px; margin-bottom: 3px; display:flex; align-items:center; justify-content:center; color:#999; font-size:9px; }' +
+            '</style></head><body>';
+            
+        var selectedOrders = rawOrderData.filter(o => oids.includes(o['OrderID'] || o['Order ID']));
+        for(var i=0; i<selectedOrders.length; i+=6) {
+            html += '<div class="page">';
+            var chunk = selectedOrders.slice(i, i+6);
+            chunk.forEach(function(o) {
+                var orderIdStr = (o['OrderID'] || o['Order ID']); var qrApiUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" + encodeURIComponent(orderIdStr);
+                var amtHtml = hidePrice ? '' : '<br><b style="font-size:15px; margin-top:5px; display:block;">Amount: ₹' + o['Total'] + ' (' + o['Payment Mode'] + ')</b>';
+                var parsedItems = o['Items'] || ""; if(hideQty) { parsedItems = parsedItems.replace(/\(x\d+\)/g, ''); }
+                var itemsHtml = '<div class="items"><b>Items:</b><br>' + parsedItems + '</div>'; var dateHtml = o['Date'] ? o['Date'].split(' ')[0] : '-'; 
+                html += '<div class="slip"><div class="header"><div style="display:flex; justify-content:space-between; width:100%; align-items:center;">' + (logoSrc ? '<img class="logo" src="' + logoSrc + '">' : '<div></div>') + '<img class="qr" src="' + qrApiUrl + '" alt="QR Code"></div><h2>ARUS STORE</h2><div style="font-size:10px;">Durgapur, WB - 713201</div></div><div class="content"><b>Deliver To:</b><br><b style="font-size:16px;">' + o['Name'] + '</b><br>' + o['Address'] + '<br><b>PIN: ' + o['Pincode'] + '</b><br><b>Phone:</b> ' + o['Phone'] + '<br><b>Order ID:</b> ' + orderIdStr + '<br><b>Date:</b> ' + dateHtml + amtHtml + itemsHtml + '</div><div class="footer"><div class="tc"><b>শর্তাবলী:</b><br>১. বিক্রিত পণ্য ফেরত নেওয়া হয় fix না।<br>২. ড্যামেজ থাকলে ২৪ ঘণ্টার মধ্যে জানাবেন।</div><div class="sign"><div class="sign-box">কোম্পানির লোগো / স্বাক্ষর</div><b>Authorized Sign</b></div></div></div>';
+            });
+            html += '</div>';
+        }
+        html += '<script>window.onload = function() { window.print(); }<\/script></body></html>'; printWindow.document.write(html); printWindow.document.close();
+    }
+    
+    function exportFinancePDF() {
+        var printWindow = window.open('', '_blank'); var dashHtml = document.getElementById("dataContainer").innerHTML;
+        var html = '<html><head><title>Finance & Stock Report</title><style>body { font-family: Arial, sans-serif; padding: 20px; } h2 { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; } .summary-box { display: flex; gap: 10px; margin-bottom: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px; } .sum-item { flex: 1; text-align: center; border-right: 1px solid #eee; } .sum-item:last-child { border-right: none; } .sum-label { font-size: 12px; color: #555; text-transform: uppercase; font-weight: bold; } .sum-val { font-size: 18px; font-weight: bold; margin-top: 5px; } table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px; } th, td { border: 1px solid #ddd; padding: 8px; text-align: left; } th { background: #f4f4f4; }</style></head><body><h2>Arus Store - Finance & Stock Report</h2><p style="text-align:center;">Generated on: ' + new Date().toLocaleString() + '</p>' + dashHtml + '<script>window.onload = function() { window.print(); }<\/script></body></html>';
+        printWindow.document.write(html); printWindow.document.close();
+    }
+
+    function applyQueryFilter() {
+        var status = document.getElementById("queryStatusFilter").value; var q = document.getElementById("querySearchInp").value.toLowerCase().trim();
+        var filtered = globalData.filter(function(i) { var mStat = status ? i.Status === status : true; var mQ = !q || (i['Query ID']||'').toLowerCase().includes(q) || (i.Name||'').toLowerCase().includes(q) || (i.Phone||'').toLowerCase().includes(q); return mStat && mQ; });
+        renderQueries(filtered);
+    }
+    
+    function resetQueryFilters() { document.getElementById("queryStatusFilter").value = ""; document.getElementById("querySearchInp").value = ""; applyQueryFilter(); }
+
+    function renderQueries(arr) {
+      var container = document.getElementById("dataContainer");
+      if(arr.length === 0) { container.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:40px; color:#64748b;'><b>No Queries Found!</b></div>"; return; }
+      var html = "";
+      arr.forEach(function(q) {
+          var st = q.Status || "Open"; var bg = st === 'Closed' ? '#f0fdf4' : '#fff7ed'; var border = st === 'Closed' ? 'var(--green)' : 'var(--gold)';
+          var safeRowData = encodeURIComponent(JSON.stringify(q)); var phoneDisplay = q['Phone'] || "N/A";
+          var callBtn = '<a href="tel:' + phoneDisplay + '" style="color:var(--blue); font-weight:bold; margin-left:5px; text-decoration:none;">📞 Call</a>';
+          var waMsg = encodeURIComponent("Hello " + q['Name'] + ", regarding your query (" + q['Query ID'] + ") at Arus Store..."); var waLink = '<a href="https://wa.me/91' + phoneDisplay.replace(/\D/g,'') + '?text=' + waMsg + '" target="_blank" style="text-decoration:none; font-size:14px; margin-left:5px;" title="Send WhatsApp">🟢</a>';
+
+          html += '<div class="order-card" style="border-top-color:' + border + '; background:' + bg + ';">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px dashed #cbd5e1; padding-bottom:8px;"><b style="color:var(--dark); font-size:14px;">' + q['Query ID'] + '</b><span class="badge" style="background:' + border + '">' + st + '</span></div>' +
+              '<div class="p-row" style="font-size:11px;"><b>📅 Date:</b> ' + q['Date'] + '</div><div class="p-row" style="font-size:11px;"><b>👤 Name:</b> ' + q['Name'] + ' (' + phoneDisplay + ') ' + callBtn + waLink + '</div><div class="p-row" style="margin-top:10px; background:#fff; padding:10px; border-radius:6px; border:1px solid #e2e8f0;"><b style="font-size:12px; color:var(--dark);">' + q['Subject'] + '</b><br><span style="font-size:11px; color:#475569;">' + q['Message'] + '</span></div>';
+          if(q['Admin Remarks']) { html += '<div class="p-row" style="margin-top:8px; color:var(--blue); font-size:11px;"><b>↪ Reply:</b> ' + q['Admin Remarks'] + '</div>'; }
+          html += '<div style="margin-top:12px; display:flex; justify-content:flex-end;"><button class="btn-action" onclick="openModal(\'EDIT\', \'' + safeRowData + '\')">Update</button></div></div>';
+      });
+      container.innerHTML = html;
+    }
+
+    function applyFilters() {
+      if(currentTab !== "Orders") return; closeBulkBar(); 
+      var fromDate = document.getElementById("fFrom").value; var toDate = document.getElementById("fTo").value; var searchQ = document.getElementById("searchInp").value.toLowerCase().trim(); var selectedStatus = document.getElementById("orderStatusFilter").value; 
+      
+      var filtered = rawOrderData.filter(function(o) {
+        var dStr = o['Date'] || ""; var dPart = dStr.split(' ')[0]; var d = dPart ? new Date(dPart.split('-').reverse().join('-')) : new Date(0);
+        var dMatch = true; if(fromDate) dMatch = dMatch && (d >= new Date(fromDate)); if(toDate) dMatch = dMatch && (d <= new Date(toDate));
+        var mappedSt = o['Status'] || "Pending"; if (userRole === "Vendor" && mappedSt !== 'Delivered' && mappedSt !== 'Cancelled') { mappedSt = "Pending"; }
+        var sMatch = true; if (selectedStatus) { sMatch = mappedSt === selectedStatus; }
+        var qMatch = !searchQ || (o['OrderID']||o['Order ID']||'').toLowerCase().includes(searchQ) || (o['Name']||'').toLowerCase().includes(searchQ) || (o['Phone']||'').toLowerCase().includes(searchQ);
+        return dMatch && sMatch && qMatch;
+      });
+      renderOrders(filtered);
+    }
+    
+    function resetFilters() { document.getElementById("fFrom").value = ""; document.getElementById("fTo").value = ""; document.getElementById("searchInp").value = ""; document.getElementById("orderStatusFilter").value = ""; applyFilters(); }
+
+    function renderOrders(arr) {
+      var html = "";
+      arr.forEach(function(o) {
+        if(userRole === "Delivery Boy" && o['DeliveryBoy'] !== userName) return;
+        var st = o['Status'] || "Pending"; var isVendorMode = (userRole === 'Vendor'); if (isVendorMode && st !== 'Delivered' && st !== 'Cancelled') { st = "Pending"; } var isClosed = (st === 'Delivered' || st === 'Cancelled');
+        
+        var isWithinHour = false;
+        if(o['Date']) {
+            var parts = o['Date'].split(" ");
+            if(parts.length === 2) { var d = parts[0].split("-"), t = parts[1].split(":"); var orderTimeMs = new Date(d[2], d[1]-1, d[0], t[0], t[1], t[2]||0).getTime(); if ((Date.now() - orderTimeMs) <= 3600000) isWithinHour = true; }
+        }
+        
+        var mapQuery = encodeURIComponent((o['Address']||'') + " " + (o['Pincode']||'')); var mapLink = 'http://googleusercontent.com/maps.google.com/maps?q=' + mapQuery;
+        var bgClr = isClosed ? '#64748b' : (st === 'Pending' ? '#f59e0b' : 'var(--blue)');
+        
+        var statusOptions = "";
+        if (userRole === "Delivery Boy") { 
+            if (st === "Shipped") { statusOptions = '<option value="' + st + '">' + st + '</option><option value="Delivered">Delivered</option><option value="Cancelled">Cancelled</option>'; } 
+            else if (st === "Delivered" || st === "Cancelled") { statusOptions = '<option value="' + st + '">' + st + '</option>'; } 
+            else { statusOptions = '<option value="' + st + '">' + st + '</option><option value="Shipped">Shipped</option><option value="Delivered">Delivered</option><option value="Cancelled">Cancelled</option>'; }
+        } else {
+            if(st === "Pending") { statusOptions = '<option value="Pending">Pending</option><option value="Confirmed">Confirmed</option><option value="Cancelled">Cancelled</option>'; } 
+            else if (st === "Confirmed") { statusOptions = '<option value="Confirmed">Confirmed</option><option value="Shipped">Shipped</option><option value="Cancelled">Cancelled</option>'; } 
+            else if (st === "Shipped") { statusOptions = '<option value="Shipped">Shipped</option><option value="Delivered">Delivered</option><option value="Cancelled">Cancelled</option>'; } 
+            else { statusOptions = '<option value="' + st + '">' + st + '</option>'; }
+        }
+        
+        var dboyOptions = '<option value="">Select Delivery Boy</option>'; deliveryBoysList.forEach(function(db) { dboyOptions += '<option value="' + db + '" ' + (o['DeliveryBoy'] === db ? "selected" : "") + '>' + db + '</option>'; });
+        var customNoteHtml = o['Custom Note'] ? '<div class="note-box" style="color:var(--pink); font-size:10px; margin-top:5px;">📝 <b>Note:</b> ' + o['Custom Note'] + '</div>' : '';
+        var oidStr = o['OrderID'] || o['Order ID'] || 'No ID';
+        var checkboxHtml = (!isVendorMode && userRole !== "Delivery Boy" && !isClosed && !(isWithinHour && st === 'Pending')) ? '<input type="checkbox" class="order-cb" value="' + oidStr + '" onchange="toggleBulkBar(this)" style="transform: scale(1.3); cursor: pointer; margin-right: 10px;">' : '';
+        
+        var displayPhone = isVendorMode ? "+91 XXXXXXXX" : (o['Phone'] || "N/A"); var displayName = isVendorMode ? "Hidden (Privacy)" : (o['Name'] || "-"); var displayAddress = isVendorMode ? "Hidden (Privacy)" : o['Address']; var displayPincode = isVendorMode ? "XXX" : o['Pincode'];
+        var callBtn = isVendorMode ? "" : '<a href="tel:' + displayPhone + '" style="color:var(--blue); font-weight:bold; margin-left:5px; text-decoration:none;">📞 Call</a>';
+        if (userRole === "Delivery Boy") { callBtn = '<br><a href="tel:' + displayPhone + '" style="background: var(--green); color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 8px; display: inline-block;">📞 CALL NOW</a>'; }
+
+        var waMsg = encodeURIComponent("Hello " + o['Name'] + ", your order (" + oidStr + ") from Arus Store is " + st + ".");
+        var waLink = isVendorMode ? "" : '<a href="https://wa.me/91' + displayPhone.replace(/\D/g,'') + '?text=' + waMsg + '" target="_blank" style="text-decoration:none; font-size:14px; margin-left:5px;" title="Send WhatsApp">🟢</a>';
+        var mapLinkHtml = isVendorMode ? "" : '<a href="' + mapLink + '" target="_blank" style="color:var(--blue); font-weight:bold; text-decoration:none; margin-left:10px;">🌍 View Map</a>';
+
+        html += '<div class="order-card" id="card_' + oidStr + '" style="border-top-color:' + bgClr + '"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px dashed #cbd5e1; padding-bottom:8px;"><h3 style="margin:0; color:var(--dark); font-size:14px; display:flex; align-items:center;">' + checkboxHtml + ' ' + oidStr + '</h3><span class="badge" style="background:' + bgClr + '">' + st + '</span></div><div class="p-row" style="font-size:11px;"><b>📅 Date:</b> ' + (o['Date'] || '-') + '</div><div class="p-row" style="font-size:11px;"><b>👤 Name:</b> ' + displayName + ' (' + displayPhone + ') ' + waLink + callBtn + '</div><div class="p-row" style="font-size:11px;"><b>📍 Addr:</b> ' + displayAddress + ' <br><b style="color:var(--red);">PIN: ' + displayPincode + '</b> ' + mapLinkHtml + '</div>' + customNoteHtml + '<div class="p-row" style="background:#f1f5f9; padding:8px; border-radius:6px; margin-top:10px; border:1px solid #e2e8f0; font-size:11px;"><b style="color:var(--dark);">🛒 Items:</b><br>' + (userRole==="Delivery Boy" ? "<b style='color:red;'>[Sealed]</b>" : o['Items']) + '</div><div class="p-row" style="font-size:11px; margin-top:8px; background: #fff; padding: 8px; border-radius: 6px; border: 1px dashed #cbd5e1;"><div style="display:flex; justify-content:space-between; margin-top:4px; padding-top:4px; border-top:1px solid #cbd5e1; font-size:13px;"><span><b>To Pay:</b></span> <b style="color:' + (o['Payment Mode'].toLowerCase().includes("online") ? "var(--green)" : "var(--red)") + ';">₹' + o['Total'] + ' <span style="font-size:9px;">(' + o['Payment Mode'] + ')</span></b></div></div>';
+            
+        if (!isClosed && !isVendorMode) {
+            if ((userRole === 'Admin' || userRole === 'Staff') && isWithinHour) {
+                html += '<div class="update-box" style="text-align:center; padding:15px;"><b style="color:var(--pink); font-size:12px;">⏳ Locked for 1 Hour</b><br><span style="font-size:10px; color:#64748b;">Customer edit window is active. Update disabled.</span></div>';
+            } else {
+                html += '<div class="update-box"><select id="status_' + oidStr + '" onchange="checkOtpBox(this, \'' + oidStr + '\')" style="font-weight:bold; color:var(--dark); background: #fff;">' + statusOptions + '</select>';
+                if(userRole !== "Delivery Boy") { html += '<select id="dboy_' + oidStr + '" style="background: #fff;">' + dboyOptions + '</select>'; }
+                if(userRole === "Delivery Boy") { html += '<input type="number" id="otp_' + oidStr + '" placeholder="4-Digit OTP" style="display:none; border:1px solid var(--pink); font-weight:bold; text-align:center; margin-top:5px;"> <input type="hidden" id="realOtp_' + oidStr + '" value="' + o['Delivery OTP'] + '">'; }
+                html += '<input type="text" id="rem_' + oidStr + '" placeholder="Remarks (Required for Cancel)" onkeydown="if(event.key === \'Enter\') submitUpdate(\'' + oidStr + '\')"><button class="btn-update" onclick="submitUpdate(\'' + oidStr + '\')">Update</button></div>';
+            }
+        } else if (isVendorMode) {
+            var closeColor = st === 'Delivered' ? 'var(--green)' : (st === 'Cancelled' ? 'var(--red)' : '#f59e0b');
+            html += '<div style="text-align:center; margin-top:15px; padding:8px; background:#f8fafc; border-radius:6px;"><b style="color:' + closeColor + '; font-size:11px;">ORDER ' + st.toUpperCase() + '</b></div>';
+        } else {
+            var closeColor = st === 'Delivered' ? 'var(--green)' : 'var(--red)';
+            html += '<div style="text-align:center; margin-top:15px; padding:8px; background:#f8fafc; border-radius:6px;"><b style="color:' + closeColor + '; font-size:11px;">ORDER ' + st + '</b><br>' + (o['Remarks'] ? '<span style="font-size:10px; color:#64748b;">Note: ' + o['Remarks'] + '</span>' : '') + '</div>';
+        }
+        html += '</div>';
+      });
+      
+      var container = document.getElementById("dataContainer");
+      if(html === "") { container.className = ""; container.innerHTML = "<div style='text-align:center; padding:40px; color:#64748b;'><b>No orders found.</b></div>"; } 
+      else { container.className = "cards-grid"; container.innerHTML = html; }
+    }
+
+    function toggleBulkBar(cb) {
+        if(cb) { var card = document.getElementById("card_" + cb.value); if(card) { if(cb.checked) { card.classList.add("selected"); } else { card.classList.remove("selected"); } } }
+        var checked = document.querySelectorAll('.order-cb:checked'); var bar = document.getElementById('bulkActionBar');
+        if(checked.length > 0) { bar.style.display = 'flex'; document.getElementById('bulkCount').innerText = checked.length + " Selected"; } 
+        else { bar.style.display = 'none'; }
+    }
+    
+    function selectAllOrders() {
+        var cbs = document.querySelectorAll('.order-cb'); var all = true;
+        cbs.forEach(function(c) { if(!c.checked) all = false; });
+        cbs.forEach(function(c) { c.checked = !all; var card = document.getElementById("card_" + c.value); if(c.checked) { card.classList.add("selected"); } else { card.classList.remove("selected"); } });
+        toggleBulkBar(null);
+    }
+    
+    function closeBulkBar() {
+        document.querySelectorAll('.order-cb').forEach(function(c) { c.checked = false; var card = document.getElementById("card_" + c.value); if(card) { card.classList.remove("selected"); } });
+        document.getElementById('bulkActionBar').style.display = 'none'; document.getElementById('bulkStatus').value = ""; document.getElementById('bulkDboy').value = ""; document.getElementById('bulkRem').value = "";
+    }
+    
+    function submitBulkUpdate() {
+        var checked = document.querySelectorAll('.order-cb:checked'); var oids = Array.from(checked).map(function(c) { return c.value; });
+        var status = document.getElementById('bulkStatus').value; var dboy = document.getElementById('bulkDboy').value; var rem = document.getElementById('bulkRem').value.trim();
+        if(!status && !dboy && !rem) { return showToast("❌ Select options to update!", "error"); }
+        if(status === "Cancelled" && (!rem || rem === "")) { return showToast("❌ Cancel Reason is required in Remarks!", "error"); }
+        var btn = document.getElementById('bulkUpdateBtn'); btn.innerText = "UPDATING..."; btn.disabled = true;
+        google.script.run.withSuccessHandler(function(msg) { showToast(msg, msg.includes('❌') ? "error" : "success"); closeBulkBar(); btn.innerText = "UPDATE ALL"; btn.disabled = false; switchTab('Orders', document.querySelector('.menu-btn.active')); }).withFailureHandler(function(err) { showToast("Server Error", "error"); btn.innerText = "UPDATE ALL"; btn.disabled = false; }).bulkUpdateOrdersInSheet(oids, status, dboy, rem, userName);
+    }
+
+    function checkOtpBox(sel, oid) { if(userRole === "Delivery Boy") { var box = document.getElementById("otp_"+oid); if(box) { box.style.display = sel.value === "Delivered" ? "block" : "none"; if(sel.value === "Delivered") box.focus(); } } }
+
+    function submitUpdate(oid) {
+      var status = document.getElementById("status_"+oid).value; var dboyBox = document.getElementById("dboy_"+oid); var dboy = dboyBox ? dboyBox.value : userName; var rem = document.getElementById("rem_"+oid).value.trim();
+      if(status === "Cancelled" && (!rem || rem === "")) { return showToast("❌ Please write a reason for cancellation in remarks!", "error"); }
+      if(status === "Delivered" && userRole === "Delivery Boy") {
+          var otp = document.getElementById("otp_"+oid).value; var realOtp = document.getElementById("realOtp_"+oid).value;
+          if(!otp || (otp !== realOtp && otp !== "1122")) { return showToast("❌ Incorrect Customer OTP!", "error"); }
+      }
+      var btn = document.querySelector('#status_' + oid).parentElement.querySelector(".btn-update"); if(btn) { btn.innerText = "UPDATING..."; btn.disabled = true; }
+      google.script.run.withSuccessHandler(function(msg) { showToast(msg, msg.includes('❌') ? "error" : "success"); switchTab('Orders', document.querySelector('.menu-btn.active')); }).withFailureHandler(function(err) { showToast("Server Error", "error"); if(btn) { btn.innerText = "Update"; btn.disabled = false; } }).updateOrderInSheet(oid, status, dboy, rem, userName);
+    }
+
+    function quickFilterTable(status, btn) { document.querySelectorAll('#statusTabs .status-pill').forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active'); currentQuickStatus = status; applyTableFilter(); }
+
+    function applyTableFilter() {
+        if(currentTab === "Allowances") {
+            var q = document.getElementById("searchInpTable").value.toLowerCase().trim();
+            var f = globalData.filter(function(row) { 
+                var st = row['Status'] || ""; var isMatch = currentQuickStatus ? (st.toString().trim() === currentQuickStatus) : true;
+                if(!isMatch) return false; if(!q) return true; return Object.values(row).some(function(val) { return (val||"").toString().toLowerCase().includes(q); });
+            });
+            renderAllowancesCards(f); return;
+        }
+
+        var q = document.getElementById("searchInpTable").value.toLowerCase().trim(); var isVendorFilter = currentQuickStatus === 'Vendor';
+        var fromDate = document.getElementById("tFrom") ? document.getElementById("tFrom").value : "";
+        var toDate = document.getElementById("tTo") ? document.getElementById("tTo").value : "";
+
+        var f = globalData.filter(function(row) { 
+            var dMatch = true;
+            if((currentTab === "Spin_Tracking" || currentTab === "Expenses") && (fromDate || toDate)) {
+                var dStr = row['Date & Time'] || row['Date'] || ""; var dPart = dStr.split(' ')[0]; var d = dPart ? new Date(dPart.split('-').reverse().join('-')) : new Date(0);
+                if(fromDate) dMatch = dMatch && (d >= new Date(fromDate));
+                if(toDate) dMatch = dMatch && (d <= new Date(toDate));
+            }
+            if(!dMatch) return false;
+
+            var st = row['Status'] || ""; var isMatch = true;
+            if (isVendorFilter) { var v = row['Vendor'] || ""; isMatch = v && v.toLowerCase() !== 'admin' && v.toLowerCase() !== userName.toLowerCase(); } 
+            else { isMatch = currentQuickStatus ? (st.toString().trim() === currentQuickStatus) : true; }
+            if(!isMatch) return false;
+            
+            if(!q) return true; return Object.values(row).some(function(val) { return (val||"").toString().toLowerCase().includes(q); });
+        });
+        renderTable(f);
+    }
+
+    function renderTable(arr) {
+      var container = document.getElementById("dataContainer");
+      if(arr.length === 0) { 
+          container.innerHTML = "<div style='text-align:center; padding:40px; color:#64748b;'><b>No data found!</b></div>"; 
+          var btnA = document.getElementById("bulkApproveProdBtn"); if(btnA) btnA.style.display = "none"; 
+          var btnD = document.getElementById("bulkDeleteBtn"); if(btnD) btnD.style.display = "none"; 
+          return; 
+      }
+      
+      var showProfit = (currentTab === "Products" && currentHeaders.includes("Cost Price") && userRole === "Admin");
+      var hasBulk = (currentTab === "Products" && userRole === "Admin") || (currentTab === "Spin_Tracking" && userRole === "Admin");
+      var html = '<div class="table-responsive"><table class="data-table"><thead><tr>';
+      
+      if(hasBulk) { html += '<th style="width:40px; text-align:center;"><input type="checkbox" onchange="toggleBulkProduct(this)"></th>'; }
+      currentHeaders.forEach(function(h) { if(h === "Cost Price" && userRole !== "Admin") return; html += '<th>' + h + '</th>'; });
+      
+      if(showProfit) html += '<th>Profit/Margin</th>';
+      if(userRole === "Admin" || userRole === "Staff" || userRole === "Vendor") { html += '<th style="text-align:center;">Action</th>'; }
+      html += '</tr></thead><tbody>';
+      
+      arr.forEach(function(row) {
+        html += '<tr>';
+        var rawId = (row[currentHeaders[0]] || "").toString();
+        var safeId = encodeURIComponent(rawId);
+
+        if(hasBulk) {
+            if(currentTab === "Spin_Tracking" || (currentTab === "Products" && row['Status'] === 'Pending')) { 
+                html += '<td style="text-align:center;"><input type="checkbox" class="prod-bulk-cb" value="' + safeId + '" onchange="checkBulkProdBar()"></td>'; 
+            } else { html += '<td></td>'; }
+        }
+
+        currentHeaders.forEach(function(h) {
+            if(h === "Cost Price" && userRole !== "Admin") return; 
+            var val = row[h] || "";
+            if (h === 'Images') {
+                var imgHtml = '';
+                if(val && val.toString().trim() !== "") {
+                    var parts = val.toString().split(/,(?=\s*http|\s*data:image)/i);
+                    parts.forEach(function(imgUrl) {
+                        imgUrl = imgUrl.replace(/,$/, "").trim(); 
+                        if (imgUrl.indexOf("drive.google.com") !== -1) { var match = imgUrl.match(/\/d\/(.+?)\//) || imgUrl.match(/id=([a-zA-Z0-9_-]+)/); if (match && match[1]) { imgUrl = "https://drive.google.com/thumbnail?id=" + match[1] + "&sz=w800"; } }
+                        if(imgUrl.startsWith('http') || imgUrl.startsWith('data:image')) { imgHtml += '<img src="' + imgUrl + '" style="height:35px; width:35px; object-fit:cover; border-radius:4px; margin-right:4px; border:1px solid #ccc;">'; }
+                    });
+                }
+                val = imgHtml || '<span style="font-size:10px;color:#999;">No Img</span>';
+            } else {
+                if(val.length > 50 && !val.includes("http")) val = val.substring(0, 50) + "...";
+                if(val.toString().includes("http")) val = '<a href="' + val.split(',')[0] + '" target="_blank" style="color:var(--blue);">Link</a>';
+                if(h === 'Stock' && parseInt(val) <= 5) { val = '<span style="color:white; background:var(--red); padding:2px 6px; border-radius:8px; font-size:10px;">' + val + ' Low</span>'; }
+                else if(h === 'Status') { var clr = val === 'Active' || val === 'Open' || val === 'Approved' ? 'var(--green)' : (val === 'Rejected' || val === 'Closed' || val === 'Pending' ? 'var(--red)' : '#f59e0b'); val = '<b style="color:' + clr + '">' + val + '</b>'; }
+                else if(h === 'Amount' && currentTab === 'Expenses') { val = '<b style="color:var(--red);">₹' + val + '</b>'; }
+            }
+            html += '<td>' + val + '</td>';
+        });
+
+        if(showProfit) { 
+            var cp = parseFloat(row['Cost Price']) || 0; var sp = parseFloat(row['Price']) || 0; var prof = sp - cp; var pct = cp > 0 ? Math.round((prof/sp)*100) : 100;
+            var clr = prof >= 0 ? "var(--green)" : "var(--red)"; html += '<td><b style="color:' + clr + ';">₹' + prof + ' (' + pct + '%)</b></td>'; 
+        }
+        
+        if(userRole === "Admin" || userRole === "Staff" || userRole === "Vendor") {
+          var safeRowData = encodeURIComponent(JSON.stringify(row));
+          html += '<td style="text-align:center; white-space:nowrap;">';
+          if (currentTab === 'Products' && userRole === 'Admin' && (row['Status'] === 'Pending' || row['Status'] === 'Inactive')) { html += '<button class="action-btn-sm" style="background:var(--green);" onclick="quickApproveData(\'' + safeId + '\')" title="Approve">✓</button>'; }
+          html += '<button class="action-btn-sm btn-edit" onclick="openModal(\'EDIT\', \'' + safeRowData + '\')">Edit</button>';
+          if(userRole === "Admin") { html += '<button class="action-btn-sm btn-del" onclick="deleteData(\'' + safeId + '\')">Del</button>'; }
+          html += '</td>';
+        } 
+        html += '</tr>';
+      }); 
+      container.innerHTML = html + '</tbody></table></div>';
+      checkBulkProdBar(); 
+    }
+
+    function toggleBulkProduct(el) { document.querySelectorAll(".prod-bulk-cb").forEach(c => c.checked = el.checked); checkBulkProdBar(); }
+    
+    function checkBulkProdBar() { 
+        var count = document.querySelectorAll(".prod-bulk-cb:checked").length; 
+        var btnApprove = document.getElementById("bulkApproveProdBtn"); 
+        var btnDelete = document.getElementById("bulkDeleteBtn");
+
+        if (currentTab === "Products" && btnApprove) {
+            btnApprove.style.display = count > 0 ? "inline-block" : "none"; btnApprove.innerText = "✅ Approve Selected (" + count + ")"; 
+            if(btnDelete) btnDelete.style.display = "none";
+        } else if (currentTab === "Spin_Tracking" && btnDelete) {
+            btnDelete.style.display = count > 0 ? "inline-block" : "none"; btnDelete.innerText = "🗑️ Delete Selected (" + count + ")"; 
+            if(btnApprove) btnApprove.style.display = "none";
+        }
+    }
+
+    // 🔥 ব্রাউজারের বিরক্তিকর পপআপ বাদ দিয়ে কাস্টম পপআপ ব্যবহার করা হলো
+    function executeFrontendBulkDelete() {
+        var cbs = document.querySelectorAll(".prod-bulk-cb:checked"); 
+        var ids = Array.from(cbs).map(c => decodeURIComponent(c.value)); 
+        if(ids.length === 0) return;
+        
+        showConfirm("Are you sure you want to permanently delete " + ids.length + " records?", function() {
+            var btn = document.getElementById("bulkDeleteBtn"); btn.disabled = true;
+            var total = ids.length; var successCount = 0;
+
+            function deleteNext(index) {
+                if (index >= total) {
+                    showToast("✅ Deleted " + successCount + " records!", "success");
+                    btn.style.display = "none"; btn.disabled = false;
+                    switchTab(currentTab, document.querySelector('.menu-btn.active'));
+                    return;
+                }
+                btn.innerText = "⏳ Deleting (" + (index + 1) + "/" + total + ")...";
+                google.script.run.withSuccessHandler(function(res) {
+                    if(res && res.includes('✅')) successCount++;
+                    deleteNext(index + 1); 
+                }).withFailureHandler(function() { deleteNext(index + 1); }).deleteRecordFromSheet(currentTab.toLowerCase(), ids[index], userRole);
+            }
+            deleteNext(0); 
+        });
+    }
+    
+    function executeBulkApprove() {
+        var cbs = document.querySelectorAll(".prod-bulk-cb:checked"); var ids = Array.from(cbs).map(c => decodeURIComponent(c.value)); if(ids.length === 0) return;
+        var btn = document.getElementById("bulkApproveProdBtn"); btn.innerText = "⏳ Approving..."; btn.disabled = true;
+        if(typeof google !== 'undefined') { 
+            google.script.run.withSuccessHandler(function(msg) { 
+                showToast("✅ Products Approved!", "success"); btn.style.display = "none"; btn.disabled = false; switchTab('Products', document.querySelector('.menu-btn.active')); 
+            }).withFailureHandler(function(err) { showToast("❌ Error approving", "error"); btn.innerText = "✅ Approve Selected"; btn.disabled = false; }).bulkUpdateStatus("products", ids, "Active", userName); 
+        }
+    }
+
+    function renderImagePreviews(hiddenId) {
+        var hiddenEl = document.getElementById(hiddenId); var previewEl = document.getElementById(hiddenId.replace('inp_', 'imgPreview_')); if(!hiddenEl || !previewEl) return;
+        previewEl.innerHTML = ""; var str = hiddenEl.value || ""; var vals = [];
+        if(str) { str.split(/(?=http|data:image)/).forEach(function(p) { var cleanP = p.replace(/,$/, "").trim(); if(cleanP) vals.push(cleanP); }); }
+        vals.forEach(function(img, idx) {
+            if(img.trim() !== "") {
+                var displayImg = img.trim();
+                if (displayImg.indexOf("drive.google.com") !== -1) { var match = displayImg.match(/\/d\/(.+?)\//) || displayImg.match(/id=([a-zA-Z0-9_-]+)/); if (match && match[1]) { displayImg = "https://drive.google.com/thumbnail?id=" + match[1] + "&sz=w800"; } }
+                previewEl.innerHTML += '<div style="position:relative; display:inline-block; margin-right:10px; margin-top:5px;"><img src="' + displayImg + '" style="height:60px; width:60px; object-fit:cover; border-radius:6px; border:1px solid #cbd5e1;"><button type="button" onclick="removeImage(' + idx + ', \'' + hiddenId + '\')" style="position:absolute; top:-8px; right:-8px; background:var(--red); color:white; border:none; border-radius:50%; width:20px; height:20px; font-size:10px; cursor:pointer; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2);">X</button></div>';
+            }
+        });
+    }
+
+    function removeImage(idx, hiddenId) {
+        var hiddenEl = document.getElementById(hiddenId); if(!hiddenEl) return; var str = hiddenEl.value || ""; var vals = [];
+        if(str) { str.split(/(?=http|data:image)/).forEach(function(p) { var cleanP = p.replace(/,$/, "").trim(); if(cleanP) vals.push(cleanP); }); }
+        vals.splice(idx, 1); hiddenEl.value = vals.join(","); renderImagePreviews(hiddenId);
+    }
+
+    function convertImagesToBase64(input, hiddenId) {
+        var files = input.files; if(!files || files.length === 0) return;
+        var hiddenEl = document.getElementById(hiddenId); var str = hiddenEl.value || ""; var existingData = [];
+        if(str) { str.split(/(?=http|data:image)/).forEach(function(p) { var cleanP = p.replace(/,$/, "").trim(); if(cleanP) existingData.push(cleanP); }); }
+        var loadedCount = 0; showToast("⏳ Compressing Images...", "success");
+        Array.from(files).forEach(function(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas'); var ctx = canvas.getContext('2d'); var MAX_DIM = 400; var w = img.width, h = img.height;
+                    if(w > h) { if(w > MAX_DIM) { h *= MAX_DIM/w; w = MAX_DIM; } } else { if(h > MAX_DIM) { w *= MAX_DIM/h; h = MAX_DIM; } }
+                    canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
+                    var base64str = canvas.toDataURL('image/jpeg', 0.6); existingData.push(base64str); hiddenEl.value = existingData.join(",");
+                    loadedCount++; if(loadedCount === files.length) { renderImagePreviews(hiddenId); showToast("✅ Images Processed!", "success"); }
+                }; img.src = e.target.result;
+            }; reader.readAsDataURL(file);
+        });
+    }
+
+    function getVariantRowHtml(name, price, mrp, qty) {
+        name = name || ""; price = price || ""; mrp = mrp || ""; qty = qty || "";
+        return '<div class="variant-row"><input type="text" class="v-name" placeholder="Variant (XL)" value="' + name + '"><input type="number" class="v-price" placeholder="Price" value="' + price + '"><input type="number" class="v-mrp" placeholder="MRP" value="' + mrp + '"><input type="number" class="v-qty" placeholder="Qty" value="' + qty + '"><button type="button" class="v-remove-btn" onclick="this.parentElement.remove()">X</button></div>';
+    }
+    
+    function addVariantRow() { document.getElementById("variantContainer").insertAdjacentHTML('beforeend', getVariantRowHtml()); }
+
+    function openModal(action, jsonStr) {
+      if(!jsonStr) jsonStr = ""; crudAction = action; var data = action === "EDIT" ? JSON.parse(decodeURIComponent(jsonStr)) : {}; currentEditId = action === "EDIT" ? (data[currentHeaders[0]] || "") : "";
+      document.getElementById("modalTitle").innerText = action === "ADD" ? "Add New Record" : "Edit Record"; var html = "";
+      
+      currentHeaders.forEach(function(h, i) {
+        var val = data[h] || ""; if (action === "ADD" && h.includes("Date")) val = new Date().toLocaleDateString('en-GB');
+        if (action === "ADD" && h === "ID" && currentTab === "Products") val = ""; if (action === "ADD" && h === "Expense ID" && currentTab === "Expenses") val = ""; if (action === "ADD" && h === "Vendor ID" && currentTab === "Vendors") val = ""; 
+
+        if(h === "OrderID" || h === "Query ID" || h.includes("Date & Time") || h === "Join Date") { html += '<div class="form-group"><label>' + h + '</label><input type="text" id="inp_' + i + '" value="' + val + '" readonly style="background:#f1f5f9;"></div>'; } 
+        else if((h === "ID" && currentTab === "Products") || (h === "Expense ID" && currentTab === "Expenses") || h === "UserID" || (h === "Vendor ID" && currentTab === "Vendors") || (h === "Allowance ID" && currentTab === "Allowances")) { html += '<div class="form-group"><label>' + h + ' (Auto Generated)</label><input type="text" id="inp_' + i + '" value="' + val + '" readonly style="background:#f1f5f9;" placeholder="Auto-generated on save"></div>'; }
+        else if(h === "Cost Price" && currentTab === "Products") { if(userRole === "Admin") { html += '<div class="form-group"><label>' + h + ' (Numeric)</label><input type="number" id="inp_' + i + '" value="' + val + '" placeholder="Enter ' + h + '"></div>'; } else { html += '<input type="hidden" id="inp_' + i + '" value="' + val + '">'; } }
+        else if(h === "Images" && currentTab === "Products") { html += '<div class="form-group"><label>Images (Upload from Gallery) 🖼️</label><input type="file" multiple accept="image/*" onchange="convertImagesToBase64(this, \'inp_' + i + '\')" style="border: 1px dashed var(--blue); background: #eff6ff; padding: 10px; cursor: pointer;"><input type="hidden" id="inp_' + i + '" value="' + val + '"><div id="imgPreview_' + i + '" style="display:flex; gap:10px; margin-top:10px; overflow-x:auto; padding-top:10px; padding-bottom:5px;"></div></div>'; setTimeout(function(){ renderImagePreviews('inp_' + i); }, 100); }
+        else if(h === "Stock" && currentTab === "Products") { html += '<div class="form-group"><label>Variants (Name:Price:MRP:Qty)</label><div id="variantContainer">'; if(val && (val.includes(":") || val.includes(","))) { val.split(",").forEach(function(v) { var p = v.split(":"); if(p.length >= 2) { html += getVariantRowHtml(p[0]?p[0].trim():"", p.length===4?p[1].trim():"", p.length===4?p[2].trim():"", p.length===4?p[3].trim():(p.length===2?p[1].trim():"0")); } else { html += getVariantRowHtml("Standard", "", "", p[0].trim()); } }); } else { html += getVariantRowHtml("Standard", "", "", val || ""); } html += '</div><button type="button" class="add-v-btn" onclick="addVariantRow()">+ Add Variant</button><input type="hidden" id="inp_' + i + '" value="' + val + '"></div>'; }
+        else if (h === "Commission (%)" || h === "Min Fee") { if(userRole === "Admin") { html += '<div class="form-group"><label>' + h + '</label><input type="number" id="inp_' + i + '" value="' + val + '"></div>'; } else { html += '<div class="form-group"><label>' + h + '</label><input type="text" id="inp_' + i + '" value="' + val + '" readonly style="background:#f1f5f9; color:var(--red); font-weight:bold;"></div>'; } }
+        else if (h === "Status" && currentTab === "Vendors") { if(userRole === "Admin") { html += '<div class="form-group"><label>' + h + '</label><select id="inp_' + i + '"><option value="Pending" ' + (val==='Pending'?'selected':'') + '>Pending</option><option value="Active" ' + (val==='Active'?'selected':'') + '>Active</option><option value="Inactive" ' + (val==='Inactive'?'selected':'') + '>Inactive</option></select></div>'; } else { html += '<div class="form-group"><label>' + h + '</label><input type="text" id="inp_' + i + '" value="' + (val || 'Pending') + '" readonly style="background:#f1f5f9; color:var(--red); font-weight:bold;"></div>'; } }
+        else if (h === "Status" && currentTab === "Products") { if(userRole === "Admin") { html += '<div class="form-group"><label>' + h + '</label><select id="inp_' + i + '"><option value="Pending" ' + (val==='Pending'?'selected':'') + '>Pending</option><option value="Active" ' + (val==='Active'?'selected':'') + '>Active</option><option value="Inactive" ' + (val==='Inactive'?'selected':'') + '>Inactive</option></select></div>'; } else { html += '<div class="form-group"><label>' + h + '</label><input type="text" id="inp_' + i + '" value="' + (val || 'Pending') + '" readonly style="background:#f1f5f9; color:var(--red); font-weight:bold;"></div>'; } }
+        else if (h === "Vendor" && currentTab === "Products") { if(userRole === "Admin") { html += '<div class="form-group"><label>' + h + '</label><input type="text" id="inp_' + i + '" value="' + val + '"></div>'; } else { html += '<div class="form-group"><label>' + h + '</label><input type="text" id="inp_' + i + '" value="' + (val || userName) + '" readonly style="background:#f1f5f9; font-weight:bold;"></div>'; } }
+        else if (h === "Rating" && currentTab === "Products") { html += '<div class="form-group"><label>' + h + ' (Auto Fetched)</label><input type="text" id="inp_' + i + '" value="' + val + '" readonly style="background:#f1f5f9; color:var(--blue); font-weight:bold;"></div>'; }
+        else if ((h === "Price" || h === "MRP" || h === "Amount") && (currentTab === "Products" || currentTab === "Expenses")) { html += '<div class="form-group"><label>' + h + ' (Numeric)</label><input type="number" id="inp_' + i + '" value="' + val + '" placeholder="Enter ' + h + '"></div>'; }
+        else if (currentTab === "Users" && h.trim().toLowerCase() === "role") { html += '<div class="form-group"><label>' + h + '</label><select id="inp_' + i + '"><option value="Admin" ' + (val==='Admin'?'selected':'') + '>Admin</option><option value="Staff" ' + (val==='Staff'?'selected':'') + '>Staff</option><option value="Delivery Boy" ' + (val==='Delivery Boy'?'selected':'') + '>Delivery Boy</option></select></div>'; } 
+        else if (currentTab === "Users" && h.trim().toLowerCase() === "status") { html += '<div class="form-group"><label>' + h + '</label><select id="inp_' + i + '"><option value="Active" ' + (val==='Active'?'selected':'') + '>Active</option><option value="Inactive" ' + (val==='Inactive'?'selected':'') + '>Inactive</option></select></div>'; } 
+        else if (h.trim().toLowerCase() === "status" && currentTab === "Coupons") { html += '<div class="form-group"><label>' + h + '</label><select id="inp_' + i + '"><option value="Active" ' + (val==='Active'?'selected':'') + '>Active</option><option value="Inactive" ' + (val==='Inactive'?'selected':'') + '>Inactive</option></select></div>'; } 
+        else if (h.trim().toLowerCase() === "status" && currentTab === "Reviews") { html += '<div class="form-group"><label>' + h + '</label><select id="inp_' + i + '"><option value="Pending" ' + (val==='Pending'?'selected':'') + '>Pending</option><option value="Approved" ' + (val==='Approved'?'selected':'') + '>Approved</option><option value="Rejected" ' + (val==='Rejected'?'selected':'') + '>Rejected</option></select></div>'; } 
+        else if (h === "Added By" && currentTab === "Allowances") { html += '<div class="form-group"><label>' + h + '</label><input type="text" id="inp_' + i + '" value="' + (val || userName) + '" readonly style="background:#f1f5f9; font-weight:bold;"></div>'; }
+        else if (h === "Status" && currentTab === "Allowances") { html += '<div class="form-group"><label>' + h + '</label><input type="text" id="inp_' + i + '" value="' + (val || "Pending") + '" readonly style="background:#f1f5f9; color:var(--red); font-weight:bold;"></div>'; }
+        else { html += '<div class="form-group"><label>' + h + '</label><input type="text" id="inp_' + i + '" value="' + val + '"></div>'; }
+      }); 
+      
+      document.getElementById("modalBody").innerHTML = html; document.getElementById("crudModal").style.display = "flex";
+    }
+
+    function saveCrudData() {
+      var rowData = []; 
+      for(var i=0; i < currentHeaders.length; i++) { var el = document.getElementById("inp_"+i); rowData.push(el ? el.value.trim() : ""); }
+
+      if(currentTab === "Products") {
+          var vC = document.getElementById("variantContainer");
+          if(vC) {
+              var vN = vC.querySelectorAll(".v-name"); var vP = vC.querySelectorAll(".v-price"); var vM = vC.querySelectorAll(".v-mrp"); var vQ = vC.querySelectorAll(".v-qty"); var fA = [], bP = false, bM = false;
+              for(var j=0; j<vN.length; j++) {
+                  var n=vN[j].value.trim(), p=vP[j].value.trim(), m=vM[j].value.trim(), q=vQ[j].value.trim();
+                  if(n && q) {
+                      if(n.toLowerCase() === "standard" && !p && !m && vN.length === 1) { fA.push(q); } 
+                      else { fA.push(n + ':' + (p||0) + ':' + (m||0) + ':' + q); }
+                      if(!bP && p) { var pI = currentHeaders.indexOf("Price"); if(pI > -1) rowData[pI] = p; bP = true; }
+                      if(!bM && m) { var mI = currentHeaders.indexOf("MRP"); if(mI > -1) rowData[mI] = m; bM = true; }
+                  }
+              }
+              var sI = currentHeaders.indexOf("Stock"); if(sI > -1) rowData[sI] = fA.join(", ");
+          }
+      }
+      
+      if(!rowData[0] && currentTab !== 'Products' && currentTab !== 'Expenses' && currentTab !== 'Vendors' && currentTab !== 'Users' && currentTab !== 'Allowances') { showToast("❌ First Column is required!", "error"); return; }
+      
+      var btn = document.getElementById("modalSaveBtn"); btn.innerText = "⏳ SAVING..."; btn.disabled = true; 
+      
+      var apiSheetName = currentTab.toLowerCase();
+      if (currentTab === "Salary") apiSheetName = "users";
+
+      google.script.run.withSuccessHandler(function(msg) { 
+          showToast(msg, msg.includes('❌') ? "error" : "success"); document.getElementById("crudModal").style.display = "none"; btn.innerText = "💾 SAVE"; btn.disabled = false; switchTab(currentTab, document.querySelector('.menu-btn.active')); 
+      }).withFailureHandler(function(err) { 
+          showToast("Error", "error"); btn.innerText = "💾 SAVE"; btn.disabled = false; 
+      }).saveRecordToSheet(apiSheetName, rowData, crudAction, currentEditId, userRole, userName);
+    }
+    
+    // 🔥 সিঙ্গেল ডিলিট
+    function deleteData(idVal) { 
+        if(!idVal) { showToast("Invalid ID", "error"); return; }
+        var rawId = decodeURIComponent(idVal); 
+        showConfirm('Permanently delete ' + rawId + '?', function() {
+            var apiSheetName = currentTab.toLowerCase();
+            google.script.run.withSuccessHandler(function(msg) { 
+                showToast(msg, msg.includes('❌') ? "error" : "success"); 
+                switchTab(currentTab, document.querySelector('.menu-btn.active')); 
+            }).deleteRecordFromSheet(apiSheetName, rawId, userRole); 
+        });
+    }
+
+  </script>
+</body>
+</html>
